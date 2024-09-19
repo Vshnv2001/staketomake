@@ -1,77 +1,93 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Container, Title, Text, Paper, Group, Button, LoadingOverlay } from '@mantine/core';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { Container, Stack, Modal } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useWeb3 } from '../../contexts/web3context';
+import Layout from '../../components/layout/layout';
+import GoalHeader from '../../components/goals/goalheader';
+import SubmissionButton from '../../components/goals/submissionbutton';
+import PendingVerifications from '../../components/goals/pendingverifications';
+import SubmissionHistory from '../../components/goals/submissionhistory';
+import { GoalData, Submission } from '../../types/goal';
 
-// Assuming you have a function to fetch goal details from your smart contract
-import { Goal, getGoalDetails } from '../../utils/api';
+const mockGoalData: GoalData = {
+  id: '1',
+  name: 'Daily Exercise Challenge',
+  amountStaked: 0.5,
+  participants: 3,
+  startDate: '2024-09-01',
+  endDate: '2024-09-03',
+  currentDay: 3,
+  totalDays: 3,
+  submissions: [
+    { day: 3, person: 'person 2', status: 'pending submission' },
+    { day: 3, person: 'person 3', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
+    { day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
+    { day: 2, person: 'person 2', status: 'missing' },
+    { day: 2, person: 'person 3', status: 'rejected', photoUrl: 'https://example.com/photo2.jpg' },
+    { day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
+    { day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
+    { day: 1, person: 'person 3', status: 'completed', photoUrl: 'https://example.com/photo6.jpg' },
+  ],
+};
 
-export default function GoalDetails() {
+export default function GoalDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [goal, setGoal] = useState<Goal>();
-  const [loading, setLoading] = useState(true);
   const { account } = useWeb3();
+  const [goalData, setGoalData] = useState<GoalData | null>(null);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {
-    async function fetchGoalDetails() {
-      if (id) {
-        try {
-          const goalData = await getGoalDetails(id as string);
-          setGoal(goalData);
-        } catch (error) {
-          console.error('Error fetching goal details:', error);
-          // Handle error (e.g., show error message)
-        } finally {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchGoalDetails();
+    // In a real application, you would fetch the goal data based on the ID
+    setGoalData(mockGoalData);
   }, [id]);
 
-  const handleEdit = () => {
-    router.push(`/goals/edit/${id}`);
-  };
-
-  const handleDelete = async () => {
-    // Implement delete functionality
-    // This would typically involve calling a smart contract method
-    console.log('Delete goal:', id);
-  };
-
-  if (loading) {
-    return <LoadingOverlay visible={true} />;
+  if (!goalData) {
+    return <Layout><Container>Loading...</Container></Layout>;
   }
 
-  if (!goal) {
-    return <Container>
-      <Text>Goal not found</Text>
-    </Container>;
-  }
+  const canSubmit = account && goalData.submissions.some(s => s.person === account && s.status === 'pending submission');
+  const pendingVerifications = goalData.submissions.filter(s => s.status === 'pending verification');
+
+  const handleSubmitPhoto = (file: File | null) => {
+    if (file) {
+      console.log('Submitting photo:', file);
+      // Implement photo submission logic here
+    }
+  };
+
+  const handleVerify = (submission: Submission, isApproved: boolean) => {
+    console.log(`${isApproved ? 'Approving' : 'Rejecting'} submission:`, submission);
+    // Implement verification logic here
+  };
 
   return (
-    <Container size="sm">
-      <Paper shadow="xs" p="md" withBorder>
-        <Title order={2}>{goal.title}</Title>
-        <Text mt="md">{goal.description}</Text>
-        <Text mt="sm">Status: {goal.status}</Text>
-        <Text>Target Date: {new Date(goal.targetDate * 1000).toLocaleDateString()}</Text>
-        <Text>Created by: {goal.creator}</Text>
+    <Layout>
+      <Container size="lg">
+        <Stack gap="xl">
+          <GoalHeader goalData={goalData} />
+          {canSubmit && <SubmissionButton onSubmit={handleSubmitPhoto} />}
+          {pendingVerifications.length > 0 && (
+            <PendingVerifications
+              verifications={pendingVerifications}
+              onVerify={handleVerify}
+              onViewPhoto={(submission) => { setSelectedSubmission(submission); open(); }}
+            />
+          )}
+          <SubmissionHistory
+            submissions={goalData.submissions}
+            onViewPhoto={(submission) => { setSelectedSubmission(submission); open(); }}
+          />
+        </Stack>
+      </Container>
 
-        {account === goal.creator && (
-          <Group mt="lg">
-            <Button leftSection={<IconEdit size={14} />} onClick={handleEdit}>
-              Edit
-            </Button>
-            <Button leftSection={<IconTrash size={14} />} color="red" onClick={handleDelete}>
-              Delete
-            </Button>
-          </Group>
+      <Modal opened={opened} onClose={close} title="Submission Photo">
+        {selectedSubmission && selectedSubmission.photoUrl && (
+          <img src={selectedSubmission.photoUrl} alt="Submission" style={{ maxWidth: '100%', height: 'auto' }} />
         )}
-      </Paper>
-    </Container>
+      </Modal>
+    </Layout>
   );
 }
