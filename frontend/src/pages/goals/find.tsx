@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { getAllGoals, getGoalDetails } from '@/utils/api';
+import GoalCard from '@/components/goals/GoalCard';
 import Layout from '@/components/layout/layout';
-import { Stack, Group, Title, Button, Card, Text, Container } from '@mantine/core';
-import router from 'next/router';
 import { Goal } from '@/constants/Goal';
-import GoalCard from '@/components/GoalCard';
+import { getAllGoals } from '@/utils/api';
+import { Button, Container, Group, Stack, Title } from '@mantine/core';
+import router from 'next/router';
+import { useEffect, useState } from 'react';
 
 
 

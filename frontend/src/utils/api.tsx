@@ -51,7 +51,6 @@ const mockPublicGoals: Goal[] = [
   },
 ];
 
-
 const USE_MOCK_DATA = true;
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -96,3 +95,21 @@ export async function getAllGoals() {
     }
   }
 }
+
+export async function getUserGoals(id: string) {
+  if (USE_MOCK_DATA) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(mockPublicGoals);
+      }, 500);
+    });
+  } else {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/goals/user`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user goals:', error);
+      throw error;
+    }
+  }
+};

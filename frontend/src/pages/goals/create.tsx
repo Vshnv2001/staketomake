@@ -5,16 +5,8 @@ import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useWeb3 } from '../../contexts/web3context';
 import Layout from '../../components/layout/layout';
+import {GoalFormValues} from '../../types/goal';
 
-interface GoalFormValues {
-  title: string;
-  description: string;
-  stakingAmount: number;
-  startDate: Date;
-  endDate: Date;
-  verificationMethod: string;
-  isPublic: boolean;
-}
 
 export default function CreateGoal() {
   const router = useRouter();

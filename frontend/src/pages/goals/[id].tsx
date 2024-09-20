@@ -20,14 +20,14 @@ const mockGoalData: GoalData = {
   currentDay: 3,
   totalDays: 3,
   submissions: [
-    { day: 3, person: 'person 2', status: 'pending submission' },
-    { day: 3, person: 'person 3', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
-    { day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
-    { day: 2, person: 'person 2', status: 'missing' },
-    { day: 2, person: 'person 3', status: 'rejected', photoUrl: 'https://example.com/photo2.jpg' },
-    { day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
-    { day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
-    { day: 1, person: 'person 3', status: 'completed', photoUrl: 'https://example.com/photo6.jpg' },
+    { id: '1', day: 3, person: 'person 2', status: 'pending submission' },
+    { id: '2', day: 3, person: 'person 3', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
+    { id: '3', day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
+    { id: '4', day: 2, person: 'person 2', status: 'missing' },
+    { id: '5', day: 2, person: 'person 3', status: 'rejected', photoUrl: 'https://example.com/photo2.jpg' },
+    { id: '6', day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
+    { id: '7', day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
+    { id: '8', day: 1, person: 'person 3', status: 'completed', photoUrl: 'https://example.com/photo6.jpg' },
   ],
 };
 
@@ -38,10 +38,12 @@ export default function GoalDetailPage() {
   const [goalData, setGoalData] = useState<GoalData | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // In a real application, you would fetch the goal data based on the ID
+    setIsLoading(true);
     setGoalData(mockGoalData);
+    setIsLoading(false);
   }, [id]);
 
   if (!goalData) {
@@ -74,6 +76,7 @@ export default function GoalDetailPage() {
               verifications={pendingVerifications}
               onVerify={handleVerify}
               onViewPhoto={(submission) => { setSelectedSubmission(submission); open(); }}
+              isLoading={isLoading}
             />
           )}
           <SubmissionHistory

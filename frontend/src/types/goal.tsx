@@ -1,4 +1,5 @@
 export interface Submission {
+  id: string;
   day: number;
   person: string;
   status: 'completed' | 'pending submission' | 'pending verification' | 'missing' | 'rejected';
@@ -15,4 +16,14 @@ export interface GoalData {
   currentDay: number;
   totalDays: number;
   submissions: Submission[];
+}
+
+export interface GoalFormValues {
+  title: string;
+  description: string;
+  stakingAmount: number;
+  startDate: Date;
+  endDate: Date;
+  verificationMethod: string;
+  isPublic: boolean;
 }
