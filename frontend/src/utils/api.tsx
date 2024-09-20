@@ -1,71 +1,64 @@
 import axios from 'axios';
-import { Goal } from '@/constants/Goal';
+import { Goal } from '@/types/goal';
 
 const mockGoals: Record<string, Goal> = {
   '1': {
     id: '1',
-    title: 'Lose 10 pounds',
-    description: 'Exercise regularly and maintain a healthy diet to lose 10 pounds.',
+    name: 'Daily Exercise Challenge',
+    description: 'Exercise regularly to improve fitness and health.',
+    amountStaked: 0.5,
+    participants: 3,
+    startDate: '2024-09-01',
+    endDate: '2024-09-03',
+    currentDay: 3,
+    totalDays: 3,
     status: 'In Progress',
-    finishedDays: 10,
-    totalDays: 31,
-    targetDate: new Date('2023-12-31').getTime() / 1000,
     creator: '0x1234567890123456789012345678901234567890',
     creatorName: 'John Doe',
+    submissions: [
+      { id: '1', day: 3, person: 'person 2', status: 'pending submission' },
+      { id: '2', day: 3, person: 'person 3', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
+      { id: '3', day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
+      { id: '4', day: 2, person: 'person 2', status: 'missing' },
+      { id: '5', day: 2, person: 'person 3', status: 'rejected', photoUrl: 'https://example.com/photo2.jpg' },
+      { id: '6', day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
+      { id: '7', day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
+      { id: '8', day: 1, person: 'person 3', status: 'completed', photoUrl: 'https://example.com/photo6.jpg' },
+    ],
   },
   '2': {
     id: '2',
-    title: 'Learn React',
+    name: 'Learn React',
     description: 'Complete a React course and build a project using React.',
+    amountStaked: 0.3,
+    participants: 2,
+    startDate: '2023-09-01',
+    endDate: '2023-10-01',
+    currentDay: 0,
+    totalDays: 30,
     status: 'Not Started',
-    finishedDays: 0,
-    totalDays: 10,
-    targetDate: new Date('2023-10-01').getTime() / 1000,
     creator: '0x0987654321098765432109876543210987654321',
     creatorName: 'Jane Doe',
+    submissions: [],
   },
 };
 
-const mockPublicGoals: Goal[] = [
-  {
-    id: '1',
-    title: 'Lose 10 pounds',
-    description: 'Exercise regularly and maintain a healthy diet to lose 10 pounds.',
-    status: 'In Progress',
-    finishedDays: 10,
-    totalDays: 31,
-    targetDate: new Date('2023-12-31').getTime() / 1000,
-    creator: '0x1234567890123456789012345678901234567890',
-    creatorName: 'John Doe',
-  },
-  {
-    id: '2',
-    title: 'Learn React',
-    description: 'Complete a React course and build a project using React.',
-    status: 'Not Started',
-    finishedDays: 0,
-    totalDays: 10,
-    targetDate: new Date('2023-10-01').getTime() / 1000,
-    creator: '0x0987654321098765432109876543210987654321',
-    creatorName: 'Jane Doe',
-  },
-];
+const mockUserGoals: Goal[] = [mockGoals['1'], mockGoals['2']];
 
 const USE_MOCK_DATA = true;
 const API_BASE_URL = 'http://localhost:8000';
 
-export async function getGoalDetails(id: string) {
+export async function getGoalDetails(id: string): Promise<Goal> {
   if (USE_MOCK_DATA) {
-    // Using mock data
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const goal = mockGoals[id as keyof typeof mockGoals];
+        const goal = mockGoals[id];
         if (goal) {
           resolve(goal);
         } else {
           reject(new Error('Goal not found'));
         }
-      }, 500); // fake network delays
+      }, 500);
     });
   } else {
     try {
@@ -78,11 +71,11 @@ export async function getGoalDetails(id: string) {
   }
 }
 
-export async function getAllGoals() {
+export async function getAllGoals(): Promise<Goal[]> {
   if (USE_MOCK_DATA) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(mockPublicGoals);
+        resolve(Object.values(mockGoals));
       }, 500);
     });
   } else {
@@ -96,11 +89,11 @@ export async function getAllGoals() {
   }
 }
 
-export async function getUserGoals(id: string) {
+export async function getUserGoals(): Promise<Goal[]> {
   if (USE_MOCK_DATA) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(mockPublicGoals);
+        resolve(mockUserGoals);
       }, 500);
     });
   } else {
@@ -112,4 +105,4 @@ export async function getUserGoals(id: string) {
       throw error;
     }
   }
-};
+}
