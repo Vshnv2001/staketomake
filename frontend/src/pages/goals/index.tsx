@@ -1,37 +1,45 @@
-import React from 'react';
-import { Container, Title, Text, Button, Group, Stack, Card } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { Container, Title, Text, Button, Group, Stack, Card, RingProgress } from '@mantine/core';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/layout';
+import { Goal } from '@/constants/Goal';
+import { getAllGoals } from '@/utils/api';
 
-interface Goal {
-  id: number;
-  name: string;
-  progress: string;
-}
 
-// Mock data for active goals
-const activeGoals: Goal[] = [
-  { id: 1, name: 'Run 5km', progress: '10/31' },
-  { id: 2, name: 'Read 10 books', progress: '3/10' },
-];
+
 
 const Goals: React.FC = () => {
   const router = useRouter();
+  const [activeGoals, setActiveGoals] = useState<Goal[]>([]);
+
+  useEffect(() => {
+    // Fetch active goals from the API
+    getAllGoals().then(data => setActiveGoals(data));
+  }, []);
 
   return (
     <Layout>
       <Container size="lg">
         <Stack gap="xl" mt={50}>
-          <Group>
+          <Group justify='space-between'>
             <Title order={1}>Your Goals</Title>
             <Button onClick={() => router.push('/goals/create')}>Create New Goal</Button>
           </Group>
           <Stack gap="md">
             {activeGoals.map((goal) => (
               <Card key={goal.id} shadow="sm" p="lg">
-                <Group>
-                  <Text>{goal.name}</Text>
-                  <Text color="dimmed">Progress: {goal.progress}</Text>
+                <Group justify='space-between'>
+                <Stack>
+                    <Title order={2}>{goal.title}</Title>
+                    <Text><em>{goal.description}</em></Text>
+                    <Text>Created by: {goal.creatorName}</Text>
+                </Stack>
+                <RingProgress
+                  sections={[{ value: goal.finishedDays / goal.totalDays * 100, color: 'blue' }]}
+                  label={<Text size="sm" c="blue" ta="center">
+                    {Math.round(goal.finishedDays / goal.totalDays * 100)}%
+                    </Text>}
+                  />
                 </Group>
                 <Button variant="light" color="blue" fullWidth mt="md" radius="md">
                   View Details
@@ -39,9 +47,9 @@ const Goals: React.FC = () => {
               </Card>
             ))}
           </Stack>
-          <Title order={2} mt={40}>Find Goals</Title>
-          <Text>Explore community goals and challenges to join:</Text>
-          {/* Add a list or grid of community goals here */}
+          <Title order={2} mt={40}>Recommended Goals</Title>
+          <Text>Here are some goals that we think you might like:</Text>
+          
         </Stack>
       </Container>
     </Layout>
