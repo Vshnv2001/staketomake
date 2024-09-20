@@ -13,9 +13,9 @@ const links = [
     link: '#',
     label: 'Goals',
     links: [
-      { link: '/goals', label: 'Find/Monitor Goals' },
+      { link: '/goals/find', label: 'Find Goals' },
       { link: '/goals/create', label: 'Create Goal' },
-      { link: '/goals/my-goals', label: 'Your Goals' },
+      { link: '/goals', label: 'Your Goals' },
     ],
   },
   { link: '/about', label: 'About' },
