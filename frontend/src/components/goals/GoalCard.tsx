@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Group, Stack, Title, Text, Button, RingProgress } from '@mantine/core';
-import { Goal } from '@/constants/Goal';
 import { useRouter } from 'next/router';
+import { Goal } from '../../types/goal';
 
 interface GoalCardProps {
   goal: Goal;
@@ -24,14 +24,14 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
     >
       <Group justify='space-between'>
         <Stack>
-          <Title order={2}>{goal.title}</Title>
+          <Title order={2}>{goal.name}</Title>
           <Text><em>{goal.description}</em></Text>
           <Text>Created by: {goal.creatorName}</Text>
         </Stack>
         <RingProgress
-          sections={[{ value: goal.finishedDays / goal.totalDays * 100, color: 'blue' }]}
+          sections={[{ value: goal.currentDay / goal.totalDays * 100, color: 'blue' }]}
           label={<Text size="sm" c="blue" ta="center">
-            {Math.round(goal.finishedDays / goal.totalDays * 100)}%
+            {Math.round(goal.currentDay / goal.totalDays * 100)}%
           </Text>}
         />
       </Group>

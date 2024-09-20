@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Container, Title, Text, Button, Group, Stack, Loader } from '@mantine/core';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/layout';
-import { Goal } from '@/constants/Goal';
+import { Goal } from '@/types/goal';
 import { getAllGoals, getUserGoals } from '@/utils/api';
 import GoalCard from '@/components/goals/GoalCard';
 import { useWeb3 } from '../../contexts/web3context';
-
 
 const Goals: React.FC = () => {
   const router = useRouter();
@@ -16,14 +15,12 @@ const Goals: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { account } = useWeb3();
 
-
-
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
-        const [userGoalsData, allGoalsData] = await Promise.all<Goal[]>([
-          getUserGoals(account ?? ""),
+        const [userGoalsData, allGoalsData] = await Promise.all([
+          getUserGoals(),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);
@@ -67,7 +64,7 @@ const Goals: React.FC = () => {
     <Layout>
       <Container size="lg">
         <Stack gap="xl" mt={50}>
-          <Group justify='space-between'>
+          <Group justify="space-between">
             <Title order={1}>Your Goals</Title>
             <Button onClick={() => router.push('/goals/create')}>Create New Goal</Button>
           </Group>

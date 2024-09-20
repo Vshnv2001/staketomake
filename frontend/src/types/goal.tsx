@@ -1,20 +1,26 @@
+export type SubmissionStatus = 'completed' | 'pending submission' | 'pending verification' | 'missing' | 'rejected';
+
 export interface Submission {
   id: string;
   day: number;
   person: string;
-  status: 'completed' | 'pending submission' | 'pending verification' | 'missing' | 'rejected';
+  status: SubmissionStatus;
   photoUrl?: string;
 }
 
-export interface GoalData {
+export interface Goal {
   id: string;
   name: string;
+  description: string;
   amountStaked: number;
   participants: number;
   startDate: string;
   endDate: string;
   currentDay: number;
   totalDays: number;
+  status: 'Not Started' | 'In Progress' | 'Completed';
+  creator: string;
+  creatorName: string;
   submissions: Submission[];
 }
 

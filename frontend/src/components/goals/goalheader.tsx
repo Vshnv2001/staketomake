@@ -1,10 +1,10 @@
 import React from 'react';
 import { Card, Title, Group, Text, Progress, Stack } from '@mantine/core';
 import { IconCalendar, IconUsers, IconCoin } from '@tabler/icons-react';
-import { GoalData } from '../../types/goal';
+import { Goal } from '../../types/goal';
 
 interface GoalHeaderProps {
-  goalData: GoalData;
+  goalData: Goal;
 }
 
 export default function GoalHeader({ goalData }: GoalHeaderProps) {

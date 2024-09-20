@@ -8,42 +8,25 @@ import GoalHeader from '../../components/goals/goalheader';
 import SubmissionButton from '../../components/goals/submissionbutton';
 import PendingVerifications from '../../components/goals/pendingverifications';
 import SubmissionHistory from '../../components/goals/submissionhistory';
-import { GoalData, Submission } from '../../types/goal';
-
-const mockGoalData: GoalData = {
-  id: '1',
-  name: 'Daily Exercise Challenge',
-  amountStaked: 0.5,
-  participants: 3,
-  startDate: '2024-09-01',
-  endDate: '2024-09-03',
-  currentDay: 3,
-  totalDays: 3,
-  submissions: [
-    { id: '1', day: 3, person: 'person 2', status: 'pending submission' },
-    { id: '2', day: 3, person: 'person 3', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
-    { id: '3', day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
-    { id: '4', day: 2, person: 'person 2', status: 'missing' },
-    { id: '5', day: 2, person: 'person 3', status: 'rejected', photoUrl: 'https://example.com/photo2.jpg' },
-    { id: '6', day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
-    { id: '7', day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
-    { id: '8', day: 1, person: 'person 3', status: 'completed', photoUrl: 'https://example.com/photo6.jpg' },
-  ],
-};
+import { Goal, Submission } from '../../types/goal';
+import { getGoalDetails } from '../../utils/api';
 
 export default function GoalDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const { account } = useWeb3();
-  const [goalData, setGoalData] = useState<GoalData | null>(null);
+  const [goalData, setGoalData] = useState<Goal | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    setGoalData(mockGoalData);
-    setIsLoading(false);
+    if (id) {
+      setIsLoading(true);
+      getGoalDetails(id as string)
+        .then(setGoalData)
+        .finally(() => setIsLoading(false));
+    }
   }, [id]);
 
   if (!goalData) {
