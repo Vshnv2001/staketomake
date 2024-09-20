@@ -6,9 +6,6 @@ import { Goal } from '@/constants/Goal';
 import { getAllGoals } from '@/utils/api';
 import GoalCard from '@/components/GoalCard';
 
-
-
-
 const Goals: React.FC = () => {
   const router = useRouter();
   const [activeGoals, setActiveGoals] = useState<Goal[]>([]);
@@ -28,7 +25,7 @@ const Goals: React.FC = () => {
           </Group>
           <Stack gap="md">
             {activeGoals.map((goal) => (
-              <GoalCard goal={goal}/>
+              <GoalCard key={goal.id} goal={goal}/>
             ))}
           </Stack>
           <Title order={2} mt={40}>Recommended Goals</Title>

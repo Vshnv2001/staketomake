@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { getAllGoals, getGoalDetails } from '@/utils/api';
 import Layout from '@/components/layout/layout';
-import { Stack, Group, Title, Button, Card, Text, Container } from '@mantine/core';
-import router from 'next/router';
 import { Goal } from '@/constants/Goal';
-import GoalCard from '@/components/GoalCard';
-
+import { getAllGoals } from '@/utils/api';
+import { Container, Group, Stack, Text, Title } from '@mantine/core';
+import { useEffect, useState } from 'react';
 
 
 const About = () => {
