@@ -16,6 +16,7 @@ const links = [
       { link: '/goals/find', label: 'Find Goals' },
       { link: '/goals/create', label: 'Create Goal' },
       { link: '/goals', label: 'Your Goals' },
+      { link: '/goals/me', label: 'Me Goals' },
     ],
   },
   { link: '/about', label: 'About' },
