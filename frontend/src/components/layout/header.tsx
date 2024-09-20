@@ -15,7 +15,11 @@ const links = [
     links: [
       { link: '/goals/find', label: 'Find Goals' },
       { link: '/goals/create', label: 'Create Goal' },
+<<<<<<< Updated upstream
       { link: '/goals', label: 'Your Goals' },
+=======
+      { link: '/goals/me', label: 'Your Goals' },
+>>>>>>> Stashed changes
     ],
   },
   { link: '/about', label: 'About' },
