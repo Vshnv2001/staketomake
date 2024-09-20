@@ -4,6 +4,7 @@ import Layout from '@/components/layout/layout';
 import { Stack, Group, Title, Button, Card, Text, Container } from '@mantine/core';
 import router from 'next/router';
 import { Goal } from '@/constants/Goal';
+import GoalCard from '@/components/GoalCard';
 
 
 
@@ -25,18 +26,7 @@ const FindGoals = () => {
             </Group>
             <Stack gap="md">
               {goals.map((goal) => (
-                <Card key={goal.id} shadow="sm" p="lg">
-                  <Group>
-                    <Stack>
-                    <Title order={2}>{goal.title}</Title>
-                    <Text><em>{goal.description}</em></Text>
-                    <Text>Created by: {goal.creatorName}</Text>
-                    </Stack>
-                  </Group>
-                  <Button variant="light" fullWidth mt="md" radius="md">
-                    View Details
-                  </Button>
-                </Card>
+                <GoalCard key={goal.id} goal={goal} />
               ))}
             </Stack>
           </Stack>
