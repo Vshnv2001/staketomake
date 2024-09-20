@@ -7,7 +7,8 @@ const mockGoals: Record<string, Goal> = {
     name: 'Daily Exercise Challenge',
     description: 'Exercise regularly to improve fitness and health.',
     amountStaked: 0.5,
-    participants: 3,
+    participantsCnt: 3,
+    participants: ['0x1234567890123456789012345678901234567890', '0xEa1fa292277651251238FdDe68b4a67cF0327120', '0x1111111111111111111111111111111111111111'],
     startDate: '2024-09-01',
     endDate: '2024-09-03',
     currentDay: 3,
@@ -31,7 +32,8 @@ const mockGoals: Record<string, Goal> = {
     name: 'Learn React',
     description: 'Complete a React course and build a project using React.',
     amountStaked: 0.3,
-    participants: 2,
+    participantsCnt: 2,
+    participants: ['0x1234567890123456789012345678901234567890', '0x0987654321098765432109876543210987654321'],
     startDate: '2023-09-01',
     endDate: '2023-10-01',
     currentDay: 0,
@@ -40,6 +42,29 @@ const mockGoals: Record<string, Goal> = {
     creator: '0x0987654321098765432109876543210987654321',
     creatorName: 'Jane Doe',
     submissions: [],
+  },
+  '3': {
+    id: '3',
+    name: 'Eat More',
+    description: 'Eat more healthy foods to improve your health.',
+    amountStaked: 0.3,
+    participantsCnt: 2,
+    participants: ['0x1234567890123456789012345678901234567890', '0xEa1fa292277651251238FdDe68b4a67cF0327120'],
+    startDate: '2023-09-01',
+    endDate: '2023-10-01',
+    currentDay: 3,
+    totalDays: 30,
+    status: 'In Progress',
+    creator: '0x0987654321098765432109876543210987654321',
+    creatorName: 'Jane Doe', 
+    submissions: [
+      { id: '1', day: 3, person: 'person 2', status: 'pending submission' },
+      { id: '2', day: 3, person: 'person 1', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
+      { id: '3', day: 2, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo1.jpg' },
+      { id: '4', day: 2, person: 'person 2', status: 'missing' },
+      { id: '6', day: 1, person: 'person 1', status: 'completed', photoUrl: 'https://example.com/photo4.jpg' },
+      { id: '7', day: 1, person: 'person 2', status: 'completed', photoUrl: 'https://example.com/photo5.jpg' },
+    ],
   },
 };
 
@@ -89,7 +114,7 @@ export async function getAllGoals(): Promise<Goal[]> {
   }
 }
 
-export async function getUserGoals(): Promise<Goal[]> {
+export async function getUserGoals(account: string): Promise<Goal[]> {
   if (USE_MOCK_DATA) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -98,10 +123,56 @@ export async function getUserGoals(): Promise<Goal[]> {
     });
   } else {
     try {
-      const response = await axios.get(`${API_BASE_URL}/goals/user`);
+      const response = await axios.get(`${API_BASE_URL}/goals/user/${account ?? "1"}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching user goals:', error);
+      throw error;
+    }
+  }
+}
+
+export async function updateGoal(id: string, updateData: Partial<Goal>) {
+  if (USE_MOCK_DATA) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const goal = mockGoals[id];
+        if (goal) {
+          const updatedGoal = { ...goal, ...updateData };
+          mockGoals[id] = updatedGoal;
+          resolve(updatedGoal);
+        }
+      }, 500);
+    });
+  } else {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/goals/${id}`, updateData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating goal:', error);
+      throw error;
+    }
+  }
+}
+
+export async function uploadPhoto(goalId: string, file: File): Promise<string> {
+  if (USE_MOCK_DATA) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const photoUrl = `https://example.com/photos/${Date.now()}.jpg`;
+        resolve(photoUrl);
+      }, 500);
+    });
+  } else {
+    try {
+      const formData = new FormData();
+      formData.append('photo', file);
+      const response = await axios.post(`${API_BASE_URL}/goals/${goalId}/upload-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data.photoUrl;
+    } catch (error) {
+      console.error('Error uploading photo:', error);
       throw error;
     }
   }

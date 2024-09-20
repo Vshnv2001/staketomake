@@ -13,7 +13,8 @@ export interface Goal {
   name: string;
   description: string;
   amountStaked: number;
-  participants: number;
+  participantsCnt: number;
+  participants: string[];
   startDate: string;
   endDate: string;
   currentDay: number;

@@ -8,6 +8,8 @@ interface GoalHeaderProps {
 }
 
 export default function GoalHeader({ goalData }: GoalHeaderProps) {
+  const progressVal = (goalData.currentDay / goalData.totalDays) * 100
+
   return (
     <Card withBorder shadow="sm" p="md">
       <Stack gap="md">
@@ -19,7 +21,7 @@ export default function GoalHeader({ goalData }: GoalHeaderProps) {
           </Group>
           <Group gap="xs">
             <IconUsers size={20} />
-            <Text>{goalData.participants} participants</Text>
+            <Text>{goalData.participantsCnt} participants</Text>
           </Group>
           <Group gap="xs">
             <IconCalendar size={20} />
@@ -28,7 +30,7 @@ export default function GoalHeader({ goalData }: GoalHeaderProps) {
         </Group>
         <Progress.Root size={40} 
         >
-          <Progress.Section value={(goalData.currentDay / goalData.totalDays) * 100}>
+          <Progress.Section value={progressVal != 0 ? progressVal : 100}>
             <Progress.Label>
               {`Day ${goalData.currentDay}/${goalData.totalDays}`}
               </Progress.Label>

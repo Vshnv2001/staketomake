@@ -12,7 +12,7 @@ const Goals: React.FC = () => {
   const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);  
   const { account } = useWeb3();
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const Goals: React.FC = () => {
       try {
         setIsLoading(true);
         const [userGoalsData, allGoalsData] = await Promise.all([
-          getUserGoals(),
+          getUserGoals(account ?? ""),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);
