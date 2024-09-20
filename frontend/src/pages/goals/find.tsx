@@ -8,27 +8,31 @@ import GoalCard from '@/components/GoalCard';
 
 
 
-const About = () => {
+const FindGoals = () => {
     const [goals, setGoals] = useState<Goal[]>([]);
 
     useEffect(() => {
         // Fetch goals from the API
         getAllGoals().then(data => setGoals(data));
     }, []);
+    console.log(goals);
     return (
         <Layout>
         <Container size="lg">
           <Stack gap="xl" mt={50}>
             <Group justify='space-between'>
-              <Title order={1}>About StakeToMake</Title>
+              <Title order={1}>Find Goals</Title>
+              <Button onClick={() => router.push('/goals/create')}>Create Public Goal</Button>
             </Group>
-            <Text>StakeToMake is a platform that allows you to create and find goals that you can stake on.</Text>
-            <Text>You can create a goal and stake on it, or find a goal and stake on it.</Text>
-            <Text>You can also create a goal and find a goal.</Text>
+            <Stack gap="md">
+              {goals.map((goal) => (
+                <GoalCard key={goal.id} goal={goal} />
+              ))}
+            </Stack>
           </Stack>
         </Container>
       </Layout>
     );
 };
 
-export default About;
+export default FindGoals;
