@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { Goal } from '@/types/goal';
-import { getAuthToken } from '@dynamic-labs/sdk-react-core';
+import { Goal, GoalFormValues } from '@/types/goal';
+// import { getAuthToken } from '@dynamic-labs/sdk-react-core';
 
 const mockGoals: Record<string, Goal> = {
   '1': {
@@ -14,7 +14,7 @@ const mockGoals: Record<string, Goal> = {
     endDate: '2024-09-03',
     currentDay: 3,
     totalDays: 3,
-    status: 'In Progress',
+    status: 'Completed',
     creator: '0x1234567890123456789012345678901234567890',
     creatorName: 'John Doe',
     submissions: [
@@ -71,11 +71,11 @@ const mockGoals: Record<string, Goal> = {
 
 const mockUserGoals: Goal[] = [mockGoals['1'], mockGoals['2']];
 
-const USE_MOCK_DATA = true;
-const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
+const USE_MOCK_DATA = false;
+const API_BASE_URL = process.env.API_BASE_URL || "https://staketomake.fly.dev/api";
 const headers = {
   'Content-Type': 'application/json',
-  'Authorization': `Bearer ${getAuthToken()}`
+  // 'Authorization': `Bearer ${getAuthToken()}`
 };
 
 export async function getGoalDetails(id: string): Promise<Goal> {
@@ -93,6 +93,7 @@ export async function getGoalDetails(id: string): Promise<Goal> {
   } else {
     try {
       const response = await axios.get(`${API_BASE_URL}/goals/${id}`);
+      console.log(response.data)
       return response.data;
     } catch (error) {
       console.error('Error fetching goal details:', error);
@@ -110,7 +111,7 @@ export async function getAllGoals(): Promise<Goal[]> {
     });
   } else {
     try {
-      const response = await axios.get(`${API_BASE_URL}/goals/all`);
+      const response = await axios.get(`${API_BASE_URL}/goals`);
       return response.data;
     } catch (error) {
       console.error('Error fetching all goals:', error);
@@ -134,6 +135,37 @@ export async function getUserGoals(account: string): Promise<Goal[]> {
       return response.data;
     } catch (error) {
       console.error('Error fetching user goals:', error);
+      throw error;
+    }
+  }
+}
+
+export async function createGoal(goalDetails: GoalFormValues) {
+  if (USE_MOCK_DATA) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const goal = mockGoals[goalDetails.title];
+        if (goal) {
+          resolve(goal);
+        } else {
+          resolve(mockGoals[goalDetails.title]);
+        }
+      }, 500);
+    });
+  } else {
+    try {
+      const formattedValues = {
+        ...goalDetails,
+        startDate: goalDetails.startDate.toISOString().split('T')[0], // Format to 'YYYY-MM-DD'
+        endDate: goalDetails.endDate.toISOString().split('T')[0],     // Format to 'YYYY-MM-DD'
+      };
+      console.log(formattedValues);
+      const response = await axios.post(`${API_BASE_URL}/goals`, formattedValues  , {
+        headers: headers
+      });
+      return response.data;   
+    } catch (error) {
+      console.error('Error creating goal:', error);
       throw error;
     }
   }
@@ -177,7 +209,7 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
       const formData = new FormData();
       formData.append('photo', file);
       const response = await axios.post(`${API_BASE_URL}/goals/${goalId}/upload-photo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${getAuthToken()}` }
+        headers: headers
       });
       return response.data.photoUrl;
     } catch (error) {
@@ -186,3 +218,22 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
     }
   }
 }
+
+export async function getPhoto(fileName: string) {
+  if (USE_MOCK_DATA) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const photoUrl = `https://example.com/photos/${Date.now()}.jpg`;
+        resolve(photoUrl);
+      }, 500);
+    });
+  } else {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/goals/photos/${fileName}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching photo:', error);
+      throw error;
+    }
+  }
+} 

@@ -1,8 +1,9 @@
-import { Button, Container, Loader, Modal, Stack } from '@mantine/core';
+import { Container, Loader, Modal, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import GoalHeader from '../../components/goals/goalheader';
+import CompletedGoalView from '../../components/goals/completedgoalview';
 import PendingVerifications from '../../components/goals/pendingverifications';
 import SubmissionButton from '../../components/goals/submissionbutton';
 import SubmissionHistory from '../../components/goals/submissionhistory';
@@ -14,12 +15,11 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 export default function GoalDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { authToken, user } = useDynamicContext();
+  const { user } = useDynamicContext();
   const [goalData, setGoalData] = useState<Goal | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
 
   useEffect(() => {
     const fetchGoalDetails = async () => {
@@ -37,22 +37,20 @@ export default function GoalDetailPage() {
     if (id) {
       fetchGoalDetails();
     }
-  }, [id, goalData]);
-
-
+  }, [id]);
 
   if (!goalData) {
     return <Layout><Container><Loader size="xl" /></Container></Layout>;
   }
 
-  const isParticipant = !!authToken && goalData.participants.includes(authToken);
+  const isParticipant = goalData.participants.includes(user?.userId ?? "test");
   const canJoin = !isParticipant && goalData.status === 'Not Started';
   const canSubmit = isParticipant && goalData.status === 'In Progress' &&
     goalData.submissions.some(s => s.person === user?.firstName && s.status === 'pending submission');
   const pendingVerifications = goalData.submissions.filter(s => s.status === 'pending verification');
 
   const handleUpdateGoal = async (updateData: Partial<Goal>) => {
-    if (!authToken || !id) return;
+    if (!user?.userId || !id) return;
     setIsLoading(true);
     try {
       const updatedGoal = await updateGoal(id as string, updateData);
@@ -63,19 +61,26 @@ export default function GoalDetailPage() {
       setIsLoading(false);
     }
   };
+
   const handleJoinGoal = () => {
-    if (!authToken) return;
-    handleUpdateGoal({ participants: [...(goalData.participants || []), authToken!] });
+    if (!user?.userId) return;
+    const participantsList = [...(goalData.participants || []), user?.userId ?? "test"]
+    handleUpdateGoal({ participants: participantsList, participantsCnt: participantsList.length });
+  };
+
+  const handleLeaveGoal = () => {
+    if (!user?.userId) return;
+    const participantsList = goalData.participants.filter(p => p !== user?.userId)
+    handleUpdateGoal({ participants: participantsList, participantsCnt: participantsList.length });
   };
 
   const handleSubmitPhoto = async (file: File) => {
-    if (!file || !authToken) return;  // Check if file and authToken exist
-
-    // need some logic here to upload the file to some server for url
+    if (!file || !user?.userId) return;
+    // Logic to upload file and get URL
     const photoUrl = 'https://example.com/placeholder.jpg';  
 
     const newSubmission: Submission = {
-      id: Date.now().toString(), // Generate a temporary ID
+      id: Date.now().toString(),
       day: goalData.currentDay,
       person: user?.firstName || user?.alias || '',
       status: 'pending verification',
@@ -94,37 +99,49 @@ export default function GoalDetailPage() {
     handleUpdateGoal({ submissions: updatedSubmissions });
   };
 
+  const handleViewPhoto = (submission: Submission) => {
+    setSelectedSubmission(submission);
+    open();
+  };
+
   return (
     <Layout>
       <Container size="lg">
         <Stack gap="xl">
-          <GoalHeader goalData={goalData} />
-
-          {canJoin && (
-            <Button onClick={handleJoinGoal} loading={isLoading}>
-              Join Goal
-            </Button>
-          )}
-
-          {canSubmit && (
-            <SubmissionButton onSubmit={handleSubmitPhoto} isLoading={isLoading} />
-          )}
-
-          {isParticipant && goalData.status === 'In Progress' && pendingVerifications.length > 0 && (
-            <PendingVerifications
-              verifications={pendingVerifications}
-              onVerify={handleVerify}
-              onViewPhoto={(submission) => { setSelectedSubmission(submission); open(); }}
-              isLoading={isLoading}
-            />
-          )}
-
-          <SubmissionHistory
-            submissions={goalData.submissions}
-            onViewPhoto={(submission) => { setSelectedSubmission(submission); open(); }}
+          <GoalHeader 
+            goalData={goalData}
+            isParticipant={isParticipant}
+            canJoin={canJoin} 
+            onJoin={handleJoinGoal}
+            onLeave={handleLeaveGoal}
+            isLoading={isLoading}
           />
+          
+          {goalData.status === 'Completed' ? (
+            <CompletedGoalView goalData={goalData} onViewPhoto={handleViewPhoto} />
+          ) : (
+            <>
+              {canSubmit && (
+                <SubmissionButton onSubmit={handleSubmitPhoto} isLoading={isLoading} />
+              )}
+
+              {isParticipant && goalData.status === 'In Progress' && pendingVerifications.length > 0 && (
+                <PendingVerifications
+                  verifications={pendingVerifications}
+                  onVerify={handleVerify}
+                  onViewPhoto={handleViewPhoto} 
+                  isLoading={isLoading} 
+                />
+              )}
+
+              <SubmissionHistory
+                submissions={goalData.submissions}
+                onViewPhoto={handleViewPhoto}
+              />
+            </>
+          )}
         </Stack>
-      </Container>
+      </Container> d
 
       <Modal opened={opened} onClose={close} title="Submission Photo">
         {selectedSubmission && selectedSubmission.photoUrl && (

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch } from '@mantine/core';
+import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch, Alert } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Layout from '../../components/layout/layout';
-import {GoalFormValues} from '../../types/goal';
-
+import { GoalFormValues } from '../../types/goal';
+import { createGoal } from '../../utils/api';
 
 export default function CreateGoal() {
   const router = useRouter();
-  const { authToken} = useDynamicContext();
+  const { authToken, user } = useDynamicContext();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<GoalFormValues>({
     initialValues: {
@@ -21,7 +22,9 @@ export default function CreateGoal() {
       startDate: new Date(),
       endDate: new Date(),
       verificationMethod: '',
-      isPublic: false,
+      isPublic: true,
+      creator: user?.userId ?? "test",
+      creatorName: user?.firstName ?? "test",
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : 'Title is required'),
@@ -34,22 +37,19 @@ export default function CreateGoal() {
 
   const handleSubmit = async (values: GoalFormValues) => {
     if (!authToken) {
-      alert('Please connect your wallet first');
+      setError('Please connect your wallet first');
       return;
     }
 
     setLoading(true);
+    setError(null);
+
     try {
-      // TODO: Implement contract interaction to create a new goal
-      console.log('Creating goal:', values);
-      // Simulate blockchain interaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert('Goal created successfully!');
-      router.push('/goals');
+      const createdGoal = await createGoal(values);
+      router.push(`/goals/${createdGoal.id}`);
     } catch (error) {
       console.error('Error creating goal:', error);
-      alert('Failed to create goal. Please try again.');
+      setError('Failed to create goal. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,6 +59,7 @@ export default function CreateGoal() {
     <Layout>
       <Container size="sm">
         <Title order={1} mb="xl">Create New Goal</Title>
+        {error && <Alert color="red" mb="md">{error}</Alert>}
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             <TextInput
