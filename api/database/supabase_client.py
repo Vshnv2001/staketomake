@@ -50,10 +50,10 @@ def get_goal_by_id(goal_id: str) -> Goal:
 
 def get_goals_by_user(user_id: str) -> List[Goal]:
     """
-    Retrieve all goals for a specific user.
+    Retrieve all goals for a specific user that the user is participating in.
     """
     all_goal_models = all_goals()
-    user_goals = [goal for goal in all_goal_models if goal.creator == user_id]
+    user_goals = [goal for goal in all_goal_models if user_id in goal.participants]
     return user_goals
 
 
