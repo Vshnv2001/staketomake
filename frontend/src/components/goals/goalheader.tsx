@@ -1,41 +1,80 @@
 import React from 'react';
-import { Card, Title, Group, Text, Progress, Stack } from '@mantine/core';
+import { Card, Title, Group, Text, Progress, Stack, ThemeIcon, useMantineTheme, Button, Box } from '@mantine/core';
 import { IconCalendar, IconUsers, IconCoin } from '@tabler/icons-react';
 import { Goal } from '../../types/goal';
 
 interface GoalHeaderProps {
   goalData: Goal;
+  isParticipant: boolean;
+  canJoin: boolean;
+  onJoin: () => void;
+  onLeave: () => void;
+  isLoading: boolean;
 }
 
-export default function GoalHeader({ goalData }: GoalHeaderProps) {
-  const progressVal = (goalData.currentDay / goalData.totalDays) * 100
+export default function GoalHeader({ goalData, isParticipant, canJoin, onJoin, onLeave, isLoading }: GoalHeaderProps) {
+  const theme = useMantineTheme();
+  const progressVal = (goalData.currentDay / goalData.totalDays) * 100;
 
   return (
-    <Card withBorder shadow="sm" p="md">
+    <Card withBorder shadow="sm" p="xl" radius="md" style={{ position: 'relative' }}>
+      <Box style={{ position: 'absolute', top: 16, right: 16, zIndex: 1 }}>
+        {canJoin && (
+          <Button
+            size="sm"
+            onClick={onJoin}
+            loading={isLoading}
+          >
+            Join
+          </Button>
+        )}
+        {isParticipant && goalData.status === 'Not Started' && (
+          <Button
+            size="sm"
+            color="red"
+            variant="outline"
+            onClick={onLeave}
+            loading={isLoading}
+          >
+            Leave
+          </Button>
+        )}
+      </Box>
       <Stack gap="md">
         <Title order={2}>{goalData.name}</Title>
-        <Group justify='space-between'>
+        <Text size="sm" c="dimmed">{goalData.description}</Text>
+        <Group justify="space-between">
           <Group gap="xs">
-            <IconCoin size={20} />
-            <Text>{goalData.amountStaked} ETH staked</Text>
+            <ThemeIcon color="blue" size="lg" variant="light">
+              <IconCoin size={20} />
+            </ThemeIcon>
+            <Text fw={500}>{goalData.amountStaked} ETH staked</Text>
           </Group>
           <Group gap="xs">
-            <IconUsers size={20} />
-            <Text>{goalData.participantsCnt} participants</Text>
+            <ThemeIcon color="green" size="lg" variant="light">
+              <IconUsers size={20} />
+            </ThemeIcon>
+            <Text fw={500}>{goalData.participantsCnt} participants</Text>
           </Group>
           <Group gap="xs">
-            <IconCalendar size={20} />
-            <Text>{goalData.startDate} - {goalData.endDate}</Text>
+            <ThemeIcon color="orange" size="lg" variant="light">
+              <IconCalendar size={20} />
+            </ThemeIcon>
+            <Text fw={500}>{goalData.startDate} - {goalData.endDate}</Text>
           </Group>
         </Group>
-        <Progress.Root size={40} 
-        >
-          <Progress.Section value={progressVal != 0 ? progressVal : 100}>
-            <Progress.Label>
-              {`Day ${goalData.currentDay}/${goalData.totalDays}`}
-              </Progress.Label>
-          </Progress.Section>
-        </Progress.Root>
+        <Stack gap="xs">
+          <Text fw={500}>Progress</Text>
+          <Progress
+            value={progressVal !== 0 ? progressVal : 1}
+            size="xl"
+            radius="xl"
+            color={theme.primaryColor}
+          />
+          <Text ta="center" fz="sm" fw={500}>
+            Day {goalData.currentDay} of {goalData.totalDays}
+          </Text>
+        </Stack>
       </Stack>
     </Card>
   );

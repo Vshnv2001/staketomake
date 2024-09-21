@@ -33,4 +33,6 @@ export interface GoalFormValues {
   endDate: Date;
   verificationMethod: string;
   isPublic: boolean;
+  creator: string;
+  creatorName: string;
 }

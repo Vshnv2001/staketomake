@@ -1,9 +1,7 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from typing import List
-from datetime import date
 from models.enums import GoalStatus
 from models.submission import Submission
-import re
 
 
 class Goal(BaseModel):
@@ -21,6 +19,8 @@ class Goal(BaseModel):
     creator: str = Field(..., description="Ethereum address of the creator")
     creatorName: str = Field(..., alias="creatorName", description="Name of the creator")
     submissions: List[Submission] = Field(..., description="List of submissions by participants")
+    isPublic: bool = Field(..., alias="isPublic", description="Whether the goal is public")
+    verificationMethod: str = Field(..., description="Method of verification for the goal")
 
     class Config:
         allow_population_by_field_name = True

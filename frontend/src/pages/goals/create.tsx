@@ -1,17 +1,56 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch } from '@mantine/core';
+import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch, Alert } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Layout from '../../components/layout/layout';
-import {GoalFormValues} from '../../types/goal';
+import { GoalFormValues } from '../../types/goal';
+import { createGoal } from '../../utils/api';
+import { addDays } from 'date-fns';
+import { stakeTokens } from '@/utils/smart_contract';
 
+const tomorrow = addDays(new Date(), 1);
+const thirtyDaysFromNow = addDays(tomorrow, 30);
+
+const goalTemplates = {
+  fitness: {
+    title: "30-Day Step Challenge",
+    description: "Achieve 12,000 steps every day for 30 consecutive days.",
+    stakingAmount: 0.1,
+    startDate: tomorrow,
+    endDate: thirtyDaysFromNow,
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+  nutrition: {
+    title: "Veggie Variety",
+    description: "Eat some form of vegetables every day for 21 days.",
+    stakingAmount: 0.05,
+    startDate: tomorrow,
+    endDate: addDays(tomorrow, 21),
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+  mindfulness: {
+    title: "Gratitude Gambit",
+    description: "Write 3 unique things you're grateful for every day for 30 days. No repeats allowed.",
+    stakingAmount: 0.1,
+    startDate: tomorrow,
+    endDate: thirtyDaysFromNow,
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+};
+
+type GoalTemplateCategories = keyof typeof goalTemplates;
 
 export default function CreateGoal() {
   const router = useRouter();
-  const { authToken} = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplateCategories | null>(null);
 
   const form = useForm<GoalFormValues>({
     initialValues: {
@@ -21,7 +60,9 @@ export default function CreateGoal() {
       startDate: new Date(),
       endDate: new Date(),
       verificationMethod: '',
-      isPublic: false,
+      isPublic: true,
+      creator: primaryWallet?.address ?? "test",
+      creatorName: user?.firstName ?? "test",
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : 'Title is required'),
@@ -33,32 +74,61 @@ export default function CreateGoal() {
   });
 
   const handleSubmit = async (values: GoalFormValues) => {
-    if (!authToken) {
-      alert('Please connect your wallet first');
+    if (!user?.userId) {
+      setError('Please connect your wallet first');
       return;
     }
 
     setLoading(true);
+    setError(null);
+
     try {
-      // TODO: Implement contract interaction to create a new goal
-      console.log('Creating goal:', values);
-      // Simulate blockchain interaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      alert('Goal created successfully!');
-      router.push('/goals');
+      const createdGoal = await createGoal(values);
+      router.push(`/goals/${createdGoal.id}`);
+      //stake in a goal
+      stakeTokens(createdGoal.id, createdGoal.name, createdGoal.description, createdGoal.startDate, createdGoal.endDate, createdGoal.amountStaked);
     } catch (error) {
       console.error('Error creating goal:', error);
-      alert('Failed to create goal. Please try again.');
+      setError('Failed to create goal. Please try again.');
     } finally {
       setLoading(false);
     }
+
+  };
+
+  const handleTemplateSelect = (category: GoalTemplateCategories) => {
+    setSelectedTemplate(category);
+    const template = goalTemplates[category];
+    form.setValues({
+      ...form.values,
+      title: template.title,
+      description: template.description,
+      stakingAmount: template.stakingAmount,
+      startDate: template.startDate,
+      endDate: template.endDate,
+      verificationMethod: template.verificationMethod,
+      isPublic: template.isPublic,
+    });
   };
 
   return (
     <Layout>
       <Container size="sm">
         <Title order={1} mb="xl">Create New Goal</Title>
+        {error && <Alert color="red" mb="md">{error}</Alert>}
+
+        <Group mb="lg">
+          {Object.entries(goalTemplates).map(([category, template]) => (
+            <Button
+              key={category}
+              onClick={() => handleTemplateSelect(category as GoalTemplateCategories)}
+              variant={selectedTemplate === category ? "filled" : "light"}
+            >
+              {template.title}
+            </Button>
+          ))}
+        </Group>
+
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             <TextInput

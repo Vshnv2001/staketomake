@@ -13,7 +13,7 @@ const theme = createTheme({
   defaultRadius: 'md',
 });
 
-const DynamicContextProviderNoSSR = dynamic(() => 
+const DynamicContextProviderNoSSR = dynamic(() =>
   import('@dynamic-labs/sdk-react-core').then(mod => mod.DynamicContextProvider), { ssr: false });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -25,7 +25,7 @@ export default function App({ Component, pageProps }: AppProps) {
           walletConnectors: [EthereumWalletConnectors],
         }}
       >
-          <Component {...pageProps} />
+        <Component {...pageProps} />
       </DynamicContextProviderNoSSR>
     </MantineProvider>
   );

@@ -15,11 +15,11 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
   };
 
   return (
-    <Card 
-      key={goal.id} 
-      shadow="sm" 
-      p="lg" 
-      onClick={handleClick} 
+    <Card
+      key={goal.id}
+      shadow="sm"
+      p="lg"
+      onClick={handleClick}
       style={{ cursor: 'pointer' }}
     >
       <Group justify='space-between'>
@@ -35,11 +35,11 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
           </Text>}
         />
       </Group>
-      <Button 
-        variant="light" 
-        color="blue" 
-        fullWidth 
-        mt="md" 
+      <Button
+        variant="light"
+        color="blue"
+        fullWidth
+        mt="md"
         radius="md"
         onClick={(e) => {
           e.stopPropagation();

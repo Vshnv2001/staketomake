@@ -11,10 +11,9 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <AppShell>
-
-        <HeaderMenu />
-        {children}
-        <FooterSocial />
+      <HeaderMenu />
+      {children}
+      <FooterSocial />
     </AppShell>
   );
 };

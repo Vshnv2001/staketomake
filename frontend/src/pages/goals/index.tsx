@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Title, Text, Button, Group, Stack, Loader } from '@mantine/core';
+import { Container, Title, Text, Button, Group, Stack, Loader, Card, Center } from '@mantine/core';
 import { useRouter } from 'next/router';
 import Layout from '../../components/layout/layout';
 import { Goal } from '@/types/goal';
 import { getAllGoals, getUserGoals } from '@/utils/api';
 import GoalCard from '@/components/goals/GoalCard';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { IconFlag } from '@tabler/icons-react';
 
 const Goals: React.FC = () => {
   const router = useRouter();
   const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);  
-    const { authToken } = useDynamicContext();
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useDynamicContext();
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
         const [userGoalsData, allGoalsData] = await Promise.all([
-          getUserGoals(authToken ?? ""),
+          getUserGoals(user?.userId ?? ""),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);
@@ -38,7 +39,7 @@ const Goals: React.FC = () => {
     };
 
     fetchGoals();
-  }, [authToken]);
+  }, [user?.userId]);
 
   if (isLoading) {
     return (
@@ -68,18 +69,42 @@ const Goals: React.FC = () => {
             <Title order={1}>Your Goals</Title>
             <Button onClick={() => router.push('/goals/create')}>Create New Goal</Button>
           </Group>
-          <Stack gap="md">
-            {userGoals.map((goal) => (
-              <GoalCard key={goal.id} goal={goal} />
-            ))}
-          </Stack>
-          <Title order={2} mt={40}>Recommended Goals</Title>
-          <Text>Here are some goals that we think you might like:</Text>
-          <Stack gap="md">
-            {recommendedGoals.map((goal) => (
-              <GoalCard key={goal.id} goal={goal} />
-            ))}
-          </Stack>
+          {userGoals.length === 0 ? (
+            <Card withBorder p="xl" radius="md">
+              <Center>
+                <Stack align="center" gap="md">
+                  <IconFlag size={48} stroke={1.5} />
+                  <Title order={3}>No Goals Yet</Title>
+                  <Text>
+                    {"You haven't created or joined any goals yet. Start your journey by creating a new goal or joining an existing one!"}
+                  </Text>
+                  <Group>
+                    <Button onClick={() => router.push('/goals/create')}>Create a Goal</Button>
+                    <Button variant="light" onClick={() => router.push('/goals/explore')}>
+                      Explore Goals
+                    </Button>
+                  </Group>
+                </Stack>
+              </Center>
+            </Card>
+          ) : (
+            <Stack gap="md">
+              {userGoals.map((goal) => (
+                <GoalCard key={goal.id} goal={goal} />
+              ))}
+            </Stack>
+          )}
+          <Title order={2} mt={40}>Community Goals</Title>
+          <Text>Here are some goals that we think you might like to take a look at:</Text>
+          {recommendedGoals.length === 0 ? (
+            <Text c="dimmed">No recommended goals at the moment. Check back later!</Text>
+          ) : (
+            <Stack gap="md">
+              {recommendedGoals.map((goal) => (
+                <GoalCard key={goal.id} goal={goal} />
+              ))}
+            </Stack>
+          )}
         </Stack>
       </Container>
     </Layout>

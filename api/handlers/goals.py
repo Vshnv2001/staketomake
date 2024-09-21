@@ -8,8 +8,10 @@ from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 import database.supabase_client as db
+from handlers import checks
 from models.goal import Goal
 from models.goal_form import GoalFormValues
+from models.submission import Submission
 from models.enums import GoalStatus
 
 # Directory where uploaded photos will be stored
@@ -27,42 +29,54 @@ def create_goal(form: GoalFormValues) -> Goal:
         name=form.title,
         description=form.description,
         amountStaked=0,
-        participantsCnt=0,  # Initially zero participants
-        participants=[],  # Initially no participants
-        startDate=form.start_date,
-        endDate=form.end_date,
+        participantsCnt=1,  # Initially zero participants
+        participants=[form.creator],  # Initially no participants
+        startDate=form.startDate,
+        endDate=form.endDate,
         currentDay=1,  # Starting at day 1
-        totalDays=(datetime.date.fromisoformat(form.end_date) - datetime.date.fromisoformat(form.start_date)).days + 1,
+        totalDays=(datetime.date.fromisoformat(form.endDate) - datetime.date.fromisoformat(form.startDate)).days + 1,
         status=GoalStatus.NOT_STARTED,
         creator=form.creator,
-        creatorName=form.creator_name,
+        creatorName=form.creatorName,
         submissions=[],  # Initially no submissions
+        isPublic=form.isPublic,
+        verificationMethod=form.verificationMethod,
     )
-
-    result = db.create_goal(new_goal)
-    return result
+    new_goal = checks.test_and_set_logic(new_goal)
+    return new_goal
 
 
 def get_goal_by_id(goal_id: str) -> Goal:
     goal = db.get_goal_by_id(goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found.")
+    goal = checks.test_and_set_logic(goal)
     return goal
 
 
 def get_all_goals() -> List[Goal]:
-    return db.all_goals()
+    all_goals_checked = [checks.test_and_set_logic(goal) for goal in db.all_goals()]
+    return all_goals_checked
 
 
 def get_user_goals(user_id: str) -> List[Goal]:
-    return db.get_goals_by_user(user_id)
+    user_goals_checked = [checks.test_and_set_logic(goal) for goal in db.get_goals_by_user(user_id)]
+    return user_goals_checked
 
 
 def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
-    current_goal = get_goal_by_id(goal_id)
+    old_goal = get_goal_by_id(goal_id)
     for key, value in goal.items():
-        setattr(current_goal, key, value)
-    return db.update_goal(current_goal)
+        if key in goal:
+            if key == "submissions":
+                new_submissions = []
+                for submission in value:
+                    new_submissions.append(Submission(**submission))
+                setattr(old_goal, key, new_submissions)
+            else:
+                setattr(old_goal, key, value)
+    current_goal = checks.test_and_set_logic(old_goal)
+    return current_goal
 
 
 async def upload_photo(goal_id: str, photo: UploadFile) -> str:
