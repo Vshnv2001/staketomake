@@ -12,7 +12,9 @@ WEB3_PROVIDER = Settings().web3_provider or os.getenv("WEB3_PROVIDER")
 
 def get_contract() -> web3.eth.Contract:
     try:
-        abi = json.loads(os.path.join(os.path.dirname(__file__), "StakeContractABI.json"))
+        filepath = os.path.join(os.path.dirname(__file__), "StakeContractABI.json")
+        with open(filepath, "r") as file:
+            abi = json.load(file)
         contract = web3.Web3(provider=web3.Web3.HTTPProvider(WEB3_PROVIDER)).eth.contract(
             address="0x21EEFE85b71E0CEf9183a6ab858A9bebA769Ad52", abi=abi
         )
