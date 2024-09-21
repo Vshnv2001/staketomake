@@ -10,7 +10,7 @@ import { createGoal } from '../../utils/api';
 
 export default function CreateGoal() {
   const router = useRouter();
-  const { authToken, user } = useDynamicContext();
+  const { user } = useDynamicContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,7 @@ export default function CreateGoal() {
   });
 
   const handleSubmit = async (values: GoalFormValues) => {
-    if (!authToken) {
+    if (!user?.userId) {
       setError('Please connect your wallet first');
       return;
     }

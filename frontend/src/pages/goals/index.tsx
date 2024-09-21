@@ -13,14 +13,14 @@ const Goals: React.FC = () => {
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);  
-    const { authToken } = useDynamicContext();
+  const { user } = useDynamicContext();
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
         const [userGoalsData, allGoalsData] = await Promise.all([
-          getUserGoals(authToken ?? ""),
+          getUserGoals(user?.userId ?? ""),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);
@@ -38,7 +38,7 @@ const Goals: React.FC = () => {
     };
 
     fetchGoals();
-  }, [authToken]);
+  }, [user?.userId]);
 
   if (isLoading) {
     return (

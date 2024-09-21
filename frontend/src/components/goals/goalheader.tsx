@@ -66,7 +66,7 @@ export default function GoalHeader({ goalData, isParticipant, canJoin, onJoin, o
         <Stack gap="xs">
           <Text fw={500}>Progress</Text>
           <Progress 
-            value={progressVal} 
+            value={progressVal !== 0 ? progressVal : 1 } 
             size="xl" 
             radius="xl"
             color={theme.primaryColor}
