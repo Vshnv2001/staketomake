@@ -6,6 +6,8 @@ from models.enums import GoalStatus, SubmissionStatus
 from models.goal import Goal
 from models.submission import Submission
 
+from handlers import contract
+
 
 def test_and_set_logic(goal: Goal):
     # set goal participants count
@@ -83,6 +85,7 @@ def complete_goal(goal: Goal):
 
     # If the current date is after the end date, set the goal status to COMPLETED
     goal.status = GoalStatus.COMPLETED
+    contract.submit_goal_data(goal)
 
     # Invalidate any pending submissions
     for submission in goal.submissions:
