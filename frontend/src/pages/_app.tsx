@@ -3,10 +3,9 @@
 import '@mantine/core/styles.css';
 import type { AppProps } from 'next/app';
 import { createTheme, MantineProvider } from '@mantine/core';
-import { Web3Provider } from '../contexts/web3context';
 import '@mantine/dates/styles.css';
-import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import dynamic from 'next/dynamic';
 
 const theme = createTheme({
   /** Put your mantine theme override here */
@@ -14,19 +13,20 @@ const theme = createTheme({
   defaultRadius: 'md',
 });
 
+const DynamicContextProviderNoSSR = dynamic(() => 
+  import('@dynamic-labs/sdk-react-core').then(mod => mod.DynamicContextProvider), { ssr: false });
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <MantineProvider theme={theme}>
-      <DynamicContextProvider
+      <DynamicContextProviderNoSSR
         settings={{
           environmentId: "2c4aad80-975a-42d6-b20b-656b7cd82675",
           walletConnectors: [EthereumWalletConnectors],
         }}
       >
-      <Web3Provider>
-        <Component {...pageProps} />
-      </Web3Provider>
-      </DynamicContextProvider>
+          <Component {...pageProps} />
+      </DynamicContextProviderNoSSR>
     </MantineProvider>
   );
 }
