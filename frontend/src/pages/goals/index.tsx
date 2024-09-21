@@ -13,7 +13,7 @@ const Goals: React.FC = () => {
   const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);  
+  const [error, setError] = useState<string | null>(null);
   const { user } = useDynamicContext();
 
   useEffect(() => {

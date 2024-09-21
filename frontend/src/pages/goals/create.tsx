@@ -46,7 +46,7 @@ type GoalTemplateCategories = keyof typeof goalTemplates;
 
 export default function CreateGoal() {
   const router = useRouter();
-  const { user } = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplateCategories | null>(null);
@@ -60,7 +60,7 @@ export default function CreateGoal() {
       endDate: new Date(),
       verificationMethod: '',
       isPublic: true,
-      creator: user?.userId ?? "test",
+      creator: primaryWallet?.address ?? "test",
       creatorName: user?.firstName ?? "test",
     },
     validate: {
@@ -112,7 +112,7 @@ export default function CreateGoal() {
       <Container size="sm">
         <Title order={1} mb="xl">Create New Goal</Title>
         {error && <Alert color="red" mb="md">{error}</Alert>}
-        
+
         <Group mb="lg">
           {Object.entries(goalTemplates).map(([category, template]) => (
             <Button

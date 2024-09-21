@@ -15,7 +15,7 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 export default function GoalDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user } = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext();
   const [goalData, setGoalData] = useState<Goal | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -77,19 +77,38 @@ export default function GoalDetailPage() {
 
   const handleSubmitPhoto = async (file: File) => {
     if (!file || !user?.userId) return;
+
     // Logic to upload file and get URL
     const photoUrl = await uploadPhoto(goalData.id, file);
-    const newSubmission: Submission = {
-      id: Date.now().toString(),
-      day: goalData.currentDay,
-      person: user?.firstName ?? '',
-      status: 'pending verification',
-      photoUrl: photoUrl
-    };
 
-    handleUpdateGoal({
-      submissions: [...goalData.submissions, newSubmission]
-    });
+    // Check for existing submission for the current day
+    const existingSubmission = goalData.submissions.find(
+      s => s.day === goalData.currentDay && s.person === primaryWallet?.address
+    );
+
+    if (existingSubmission && existingSubmission.status !== 'pending verification') {
+      // If there's an existing submission pending verification, update it
+      const updatedSubmissions = goalData.submissions.map(s =>
+        s.id === existingSubmission.id ? { ...s, photoUrl: photoUrl } : s
+      );
+
+      handleUpdateGoal({
+        submissions: updatedSubmissions
+      });
+    } else {
+      // If no existing submission or it's not pending verification, create a new one
+      const newSubmission: Submission = {
+        id: Date.now().toString(),
+        day: goalData.currentDay,
+        person: primaryWallet?.address ?? '',
+        status: 'pending verification',
+        photoUrl: photoUrl
+      };
+
+      handleUpdateGoal({
+        submissions: [...goalData.submissions, newSubmission]
+      });
+    }
   };
 
   const handleVerify = (submission: Submission, isApproved: boolean) => {
@@ -108,15 +127,15 @@ export default function GoalDetailPage() {
     <Layout>
       <Container size="lg">
         <Stack gap="xl">
-          <GoalHeader 
+          <GoalHeader
             goalData={goalData}
             isParticipant={isParticipant}
-            canJoin={canJoin} 
+            canJoin={canJoin}
             onJoin={handleJoinGoal}
             onLeave={handleLeaveGoal}
             isLoading={isLoading}
           />
-          
+
           {goalData.status === 'Completed' ? (
             <CompletedGoalView goalData={goalData} onViewPhoto={handleViewPhoto} />
           ) : (
@@ -129,8 +148,8 @@ export default function GoalDetailPage() {
                 <PendingVerifications
                   verifications={pendingVerifications}
                   onVerify={handleVerify}
-                  onViewPhoto={handleViewPhoto} 
-                  isLoading={isLoading} 
+                  onViewPhoto={handleViewPhoto}
+                  isLoading={isLoading}
                 />
               )}
 

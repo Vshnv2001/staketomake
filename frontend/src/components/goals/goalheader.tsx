@@ -20,8 +20,8 @@ export default function GoalHeader({ goalData, isParticipant, canJoin, onJoin, o
     <Card withBorder shadow="sm" p="xl" radius="md" style={{ position: 'relative' }}>
       <Box style={{ position: 'absolute', top: 16, right: 16, zIndex: 1 }}>
         {canJoin && (
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             onClick={onJoin}
             loading={isLoading}
           >
@@ -29,9 +29,9 @@ export default function GoalHeader({ goalData, isParticipant, canJoin, onJoin, o
           </Button>
         )}
         {isParticipant && goalData.status === 'Not Started' && (
-          <Button 
+          <Button
             size="sm"
-            color="red" 
+            color="red"
             variant="outline"
             onClick={onLeave}
             loading={isLoading}
@@ -65,9 +65,9 @@ export default function GoalHeader({ goalData, isParticipant, canJoin, onJoin, o
         </Group>
         <Stack gap="xs">
           <Text fw={500}>Progress</Text>
-          <Progress 
-            value={progressVal !== 0 ? progressVal : 1 } 
-            size="xl" 
+          <Progress
+            value={progressVal !== 0 ? progressVal : 1}
+            size="xl"
             radius="xl"
             color={theme.primaryColor}
           />

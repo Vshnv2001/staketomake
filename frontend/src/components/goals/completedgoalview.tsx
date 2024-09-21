@@ -17,7 +17,7 @@ export default function CompletedGoalView({ goalData, onViewPhoto }: CompletedGo
       <Stack gap="xl">
         <Title order={2}>{goalData.name} - Completed</Title>
         <Text size="lg">{goalData.description}</Text>
-        
+
         <Group justify="space-between">
           <Group gap="xs">
             <ThemeIcon color="blue" size="lg" variant="light">
@@ -38,7 +38,7 @@ export default function CompletedGoalView({ goalData, onViewPhoto }: CompletedGo
             <Text fw={500}>{goalData.startDate} - {goalData.endDate}</Text>
           </Group>
         </Group>
-        
+
         <Card withBorder p="md">
           <Stack gap="md">
             <Title order={3}>Goal Summary</Title>
@@ -47,7 +47,7 @@ export default function CompletedGoalView({ goalData, onViewPhoto }: CompletedGo
             <Text>Completed Submissions: {goalData.submissions.filter(s => s.status === 'completed').length}</Text>
           </Stack>
         </Card>
-        
+
         <SubmissionHistory submissions={goalData.submissions} onViewPhoto={onViewPhoto} />
       </Stack>
     </Card>

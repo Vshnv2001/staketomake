@@ -25,23 +25,23 @@ interface StepCardProps {
 
 const steps: StepCardProps[] = [
   {
-    title: 'Create a Goal',
-    description: 'Set personal goals or join community challenges.',
+    title: 'Choose a Health Goal',
+    description: 'Find a health goal that fits your prefrences.',
     icon: IconTarget,
   },
   {
-    title: 'Track Progress',
-    description: 'Monitor your progress with our Web3-powered platform.',
+    title: 'Bet on yourself',
+    description: 'Place a bet and feel the motivation kick in.',
     icon: IconCoinBitcoin,
   },
   {
-    title: 'Join Community',
-    description: 'Engage with others and stay motivated.',
+    title: 'Create that habit',
+    description: 'Go along your habit creation journey with your friends.',
     icon: IconUsers,
   },
   {
-    title: 'Earn Rewards',
-    description: 'Complete goals and earn rewards for your achievements.',
+    title: 'Cash out',
+    description: 'Get back their bet + a profit if you win, it pays to win!',
     icon: IconTrophy,
   },
 ];
@@ -66,9 +66,9 @@ const Home: React.FC = () => {
         {!!authToken ? (
           <Stack gap="xl">
             <Stack justify="center" className="mb-16">
-              <Title order={1} className="text-center mb-2">Welcome to Goal Tracker</Title>
+              <Title order={1} className="text-center mb-2">Welcome to Stake to Make</Title>
               <Text size="xl" c="dimmed" className="text-center mb-12">
-                Set, monitor, and achieve your goals with our Web3-powered platform.
+                Set, monitor, and achieve your health goals with our Web3-powered platform.
               </Text>
 
               <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg" className="mb-12">
@@ -80,15 +80,15 @@ const Home: React.FC = () => {
 
             <Group justify="center" className="mb-16">
               <Button size="lg" onClick={() => router.push('/goals')}>
-                Explore Goals
+                Explore Health Goals
               </Button>
               <Button size="lg" variant="outline" onClick={() => router.push('/goals/create')}>
-                Create a Goal
+                Create a Health Goal
               </Button>
             </Group>
 
             <Title order={2} className="text-center mb-4">Key Features</Title>
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" className="mx-auto">
+            <SimpleGrid cols={{ base: 1 }} spacing="sm" className="mx-auto">
               <Text>• Create and manage personal goals</Text>
               <Text>• Join community goals and challenges</Text>
               <Text>• Earn rewards for completing goals</Text>
