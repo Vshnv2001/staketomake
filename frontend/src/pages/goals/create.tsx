@@ -8,6 +8,7 @@ import Layout from '../../components/layout/layout';
 import { GoalFormValues } from '../../types/goal';
 import { createGoal } from '../../utils/api';
 import { addDays } from 'date-fns';
+import { stakeTokens } from '@/utils/smart_contract';
 
 const tomorrow = addDays(new Date(), 1);
 const thirtyDaysFromNow = addDays(tomorrow, 30);
@@ -84,12 +85,15 @@ export default function CreateGoal() {
     try {
       const createdGoal = await createGoal(values);
       router.push(`/goals/${createdGoal.id}`);
+      //stake in a goal
+      stakeTokens(createdGoal.id, createdGoal.name, createdGoal.description, createdGoal.startDate, createdGoal.endDate, createdGoal.amountStaked);
     } catch (error) {
       console.error('Error creating goal:', error);
       setError('Failed to create goal. Please try again.');
     } finally {
       setLoading(false);
     }
+
   };
 
   const handleTemplateSelect = (category: GoalTemplateCategories) => {
