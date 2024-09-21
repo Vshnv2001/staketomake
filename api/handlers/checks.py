@@ -8,6 +8,16 @@ from models.submission import Submission
 
 
 def test_and_set_logic(goal: Goal):
+    # set goal participants count
+    goal.participantsCnt = len(goal.participants)
+
+    # set total days
+    goal.totalDays = (datetime.date.fromisoformat(goal.endDate) - datetime.date.fromisoformat(goal.startDate)).days + 1
+
+    # set current day
+    today = (datetime.date.today() - datetime.date.fromisoformat(goal.startDate)).days + 1
+    goal.currentDay = max(min(today, goal.totalDays), 1)
+
     goal = start_goal(goal)
     goal = create_daily_submission(goal)
     goal = complete_goal(goal)
@@ -26,26 +36,27 @@ def start_goal(goal: Goal):
 
     # If the current date is after the start date, set the goal status to IN_PROGRESS
     goal.status = GoalStatus.IN_PROGRESS
-
     return goal
 
 
 def create_daily_submission(goal: Goal):
-    # If the goal is not in progress, do nothing
-    if goal.status != GoalStatus.IN_PROGRESS:
+    # If the goal hasn't started yet, do nothing
+    if goal.status == GoalStatus.NOT_STARTED:
         return goal
 
     new_submissions = []
     today = (datetime.date.today() - datetime.date.fromisoformat(goal.startDate)).days + 1
 
-    for day in range(1, today + 1):
+    for day in range(1, min(today + 1, goal.totalDays + 1)):
         for person in goal.participants:
+            # Check if the submission already exists
             submission_index = -1
             for i, submission in enumerate(goal.submissions):
                 if submission.day == day and submission.person == person:
                     submission_index = i
                     break
 
+            # If the submission doesn't exist, create a new one
             if submission_index == -1:
                 new_submission = Submission(
                     id=str(uuid.uuid4()),
@@ -66,10 +77,6 @@ def create_daily_submission(goal: Goal):
 
 
 def complete_goal(goal: Goal):
-    # If the goal is already ended, do nothing
-    if goal.status == GoalStatus.COMPLETED:
-        return goal
-
     # If the current date is before the end date, do nothing
     if datetime.date.today() < datetime.date.fromisoformat(goal.endDate):
         return goal

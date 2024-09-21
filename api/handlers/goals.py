@@ -42,9 +42,7 @@ def create_goal(form: GoalFormValues) -> Goal:
         verificationMethod=form.verificationMethod,
     )
     new_goal = checks.test_and_set_logic(new_goal)
-
-    result = db.create_goal(new_goal)
-    return result
+    return new_goal
 
 
 def get_goal_by_id(goal_id: str) -> Goal:
