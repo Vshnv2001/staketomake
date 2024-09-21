@@ -21,7 +21,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <MantineProvider theme={theme}>
       <DynamicContextProviderNoSSR
         settings={{
-          environmentId: "2c4aad80-975a-42d6-b20b-656b7cd82675",
+          environmentId: process.env.DYNAMIC_ENV || "",
           walletConnectors: [EthereumWalletConnectors],
         }}
       >

@@ -72,7 +72,7 @@ const mockGoals: Record<string, Goal> = {
 const mockUserGoals: Goal[] = [mockGoals['1'], mockGoals['2']];
 
 const USE_MOCK_DATA = true;
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
 const headers = {
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${getAuthToken()}`

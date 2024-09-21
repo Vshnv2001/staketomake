@@ -1,17 +1,8 @@
 import Layout from '@/components/layout/layout';
-import { Goal } from '@/constants/Goal';
-import { getAllGoals } from '@/utils/api';
 import { Container, Group, Stack, Text, Title } from '@mantine/core';
-import { useEffect, useState } from 'react';
 
 
 const About = () => {
-    const [goals, setGoals] = useState<Goal[]>([]);
-
-    useEffect(() => {
-        // Fetch goals from the API
-        getAllGoals().then(data => setGoals(data));
-    }, []);
     return (
         <Layout>
         <Container size="lg">
