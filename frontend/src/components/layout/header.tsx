@@ -21,19 +21,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import { mainnet } from 'viem/chains';
 
-const links = [
-  { link: '/', label: 'Home' },
-  {
-    link: '#',
-    label: 'Goals',
-    links: [
-      { link: '/goals/find', label: 'Find Goals' },
-      { link: '/goals/create', label: 'Create Goal' },
-      { link: '/goals', label: 'Your Goals' },
-    ],
-  },
-  { link: '/about', label: 'About' },
-];
+
 
 const config = createConfig({
   chains: [mainnet],
@@ -51,10 +39,30 @@ export function HeaderMenu() {
   const clipboard = useClipboard({ timeout: 1500 }); // Clipboard state with a 1.5-second timeout
   const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
   const jwtToken = getAuthToken() || ' ';
+  let links: any[] = [];
+  if (authToken) {
+    links = [
+      { link: '/', label: 'Home' },
+      {
+        link: '#',
+        label: 'Goals',
+        links: [
+          { link: '/goals/find', label: 'Find Goals' },
+          { link: '/goals/create', label: 'Create Goal' },
+          { link: '/goals', label: 'Your Goals' },
+        ],
+      },
+      { link: '/about', label: 'About' },
+    ];
+  } else {
+    links = [
+      { link: '/', label: 'Home' },
+      { link: '/about', label: 'About' },
+    ];
+  }
   
-  console.log(jwtToken);
   const items = links.map((link) => {
-    const menuItems = link.links?.map((item) => (
+    const menuItems = link.links?.map((item: any) => (
       <Menu.Item key={item.link}>
         <Link href={item.link} className={classes.link}>
           {item.label}
