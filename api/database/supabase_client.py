@@ -1,15 +1,19 @@
 import os
-from typing import List
+from typing import List, Optional
 
 from fastapi import HTTPException
 from supabase import create_client, Client
 
 from models.goal import Goal
 from config.config import Settings
+from models.telegram_users import TelegramUser
 
 # Initialize Supabase Client
 SUPABASE_URL = Settings().supabase_url or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = Settings().supabase_key or os.getenv("SUPABASE_KEY")
+
+print("SUPABASE_URL", SUPABASE_URL)
+print("SUPABASE_KEY", SUPABASE_KEY)
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("Supabase URL and KEY must be set in the environment or config.")
@@ -115,3 +119,26 @@ def upload_photo_blob(photo_filename: str, photo_blob: bytes) -> str:
         raise HTTPException(status_code=500, detail="Photo URL not found in response.")
 
     return photo_url
+
+def update_user_telegram_id(user_id: str, telegram_id: str) -> TelegramUser:
+    """
+    Upsert a user's Telegram ID in the database.
+    """
+    client.table("telegram_users").delete().eq("user_id", user_id).execute()
+    response = client.table("telegram_users").upsert({"user_id": user_id, "telegram_id": telegram_id}).execute()
+    if not response:
+        raise HTTPException(status_code=500, detail="Failed to upsert user's Telegram ID.")
+    return response.data[0]
+
+def get_user_by_telegram_id(telegram_id: str) -> Optional[TelegramUser]:
+    """
+    Retrieve a user by their Telegram ID.
+    """
+    response = client.table("telegram_users").select("user_id", "telegram_id", "id").eq("telegram_id", telegram_id).execute()
+    if not response.data:
+        return None
+    return TelegramUser(
+        user_id=response.data[0]["user_id"],
+        telegram_id=response.data[0]["telegram_id"],
+        id=response.data[0]["id"]
+    )

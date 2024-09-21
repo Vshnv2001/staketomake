@@ -63,12 +63,12 @@ export function HeaderMenu() {
           { link: '/goals', label: 'Your Goals' },
         ],
       },
-      { link: '/about', label: 'About' },
+      { link: '/social', label: 'Social' },
     ];
   } else {
     links = [
       { link: '/', label: 'Home' },
-      { link: '/about', label: 'About' },
+      { link: '/social', label: 'Social' },
     ];
   }
 
