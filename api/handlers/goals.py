@@ -8,6 +8,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 import database.supabase_client as db
+from handlers import checks
 from models.goal import Goal
 from models.goal_form import GoalFormValues
 from models.enums import GoalStatus
@@ -40,6 +41,7 @@ def create_goal(form: GoalFormValues) -> Goal:
         isPublic=form.isPublic,
         verificationMethod=form.verificationMethod,
     )
+    new_goal = checks.test_and_set_logic(new_goal)
 
     result = db.create_goal(new_goal)
     return result
@@ -49,22 +51,26 @@ def get_goal_by_id(goal_id: str) -> Goal:
     goal = db.get_goal_by_id(goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found.")
+    goal = checks.test_and_set_logic(goal)
     return goal
 
 
 def get_all_goals() -> List[Goal]:
-    return db.all_goals()
+    all_goals_checked = [checks.test_and_set_logic(goal) for goal in db.all_goals()]
+    return all_goals_checked
 
 
 def get_user_goals(user_id: str) -> List[Goal]:
-    return db.get_goals_by_user(user_id)
+    user_goals_checked = [checks.test_and_set_logic(goal) for goal in db.get_goals_by_user(user_id)]
+    return user_goals_checked
 
 
 def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
     current_goal = get_goal_by_id(goal_id)
     for key, value in goal.items():
         setattr(current_goal, key, value)
-    return db.update_goal(current_goal)
+    current_goal = checks.test_and_set_logic(current_goal)
+    return current_goal
 
 
 async def upload_photo(goal_id: str, photo: UploadFile) -> str:
