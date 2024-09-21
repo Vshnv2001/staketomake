@@ -2,11 +2,10 @@ import datetime
 import uuid
 
 from database import supabase_client as db
+from handlers import contract
 from models.enums import GoalStatus, SubmissionStatus
 from models.goal import Goal
 from models.submission import Submission
-
-from handlers import contract
 
 
 def test_and_set_logic(goal: Goal):

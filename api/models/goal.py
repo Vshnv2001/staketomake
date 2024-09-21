@@ -1,9 +1,7 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from typing import List
-from datetime import date
 from models.enums import GoalStatus
 from models.submission import Submission
-import re
 
 
 class Goal(BaseModel):
