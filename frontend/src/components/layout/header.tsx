@@ -49,7 +49,9 @@ export function HeaderMenu() {
   const [opened, { toggle }] = useDisclosure(false);
   const { account, connectWallet, disconnectWallet } = useWeb3();
   const clipboard = useClipboard({ timeout: 1500 }); // Clipboard state with a 1.5-second timeout
-  const [jwtToken, setJwtToken] = useState(null);
+  const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
+  const jwtToken = getAuthToken() || ' ';
+  
   console.log(jwtToken);
   const items = links.map((link) => {
     const menuItems = link.links?.map((item) => (
@@ -92,13 +94,8 @@ export function HeaderMenu() {
     );
   });
 
+
   return (
-    <DynamicContextProvider
-      settings={{
-        environmentId: '2c4aad80-975a-42d6-b20b-656b7cd82675',
-        walletConnectors: [EthereumWalletConnectors],
-      }}
-    >
       <header className={classes.header}>
         <Container size="md">
           <div className={classes.inner}>
@@ -111,7 +108,6 @@ export function HeaderMenu() {
                 <QueryClientProvider client={queryClient}>
                   <DynamicWagmiConnector>
                     <DynamicWidget />
-                    <AccountInfo setJwtToken={setJwtToken} />
                   </DynamicWagmiConnector>
                 </QueryClientProvider>
               </WagmiProvider>
@@ -120,13 +116,5 @@ export function HeaderMenu() {
           </div>
         </Container>
       </header>
-    </DynamicContextProvider>
   );
 }
-
-function AccountInfo({setJwtToken}: {setJwtToken: any}) {
-  const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
-  const dynamicJwtToken = getAuthToken();
-  setJwtToken(dynamicJwtToken || '');
-  return null
-};
