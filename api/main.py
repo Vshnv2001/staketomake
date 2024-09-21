@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import goals, verify
+from routers import goals
 
 
 @asynccontextmanager
@@ -45,7 +45,6 @@ def health_check():
 
 # Routers
 app.include_router(goals.router)
-app.include_router(verify.router)
 
 if __name__ == "__main__":
     uvicorn.run(app)
