@@ -86,10 +86,10 @@ export default function GoalDetailPage() {
       s => s.day === goalData.currentDay && s.person === primaryWallet?.address
     );
 
-    if (existingSubmission && existingSubmission.status !== 'pending verification') {
+    if (existingSubmission && existingSubmission.status === 'pending submission') {
       // If there's an existing submission pending verification, update it
       const updatedSubmissions = goalData.submissions.map(s =>
-        s.id === existingSubmission.id ? { ...s, photoUrl: photoUrl } : s
+        s.id === existingSubmission.id ? { ...s, photoUrl: photoUrl, status: "pending verification" as SubmissionStatus } : s
       );
 
       handleUpdateGoal({
