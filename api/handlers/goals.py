@@ -65,8 +65,18 @@ def get_user_goals(user_id: str) -> List[Goal]:
     return user_goals_checked
 
 
-def update_goal_by_id_partial(goal_id: str, goal: Goal) -> Goal:
-    current_goal = checks.test_and_set_logic(goal)
+def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
+    old_goal = get_goal_by_id(goal_id)
+    for key, value in goal.items():
+        if key in goal:
+            if key == "submissions":
+                new_submissions = []
+                for submission in value:
+                    new_submissions.append(Submission(**submission))
+                setattr(old_goal, key, new_submissions)
+            else:
+                setattr(old_goal, key, value)
+    current_goal = checks.test_and_set_logic(old_goal)
     return current_goal
 
 
