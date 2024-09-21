@@ -58,11 +58,3 @@ async def upload_photo_endpoint(goal_id: str, photo: UploadFile = File(...)):
     """
     photo_url = await goals.upload_photo(goal_id, photo)
     return UploadPhotoResponse(photoUrl=photo_url)
-
-
-@router.get("/photos/{photo_filename}", summary="Get a photo")
-def get_photo_endpoint(photo_filename: str):
-    """
-    Retrieve a photo for a specific goal.
-    """
-    return goals.get_photo(photo_filename)
