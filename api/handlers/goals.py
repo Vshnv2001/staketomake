@@ -29,14 +29,16 @@ def create_goal(form: GoalFormValues) -> Goal:
         amountStaked=0,
         participantsCnt=0,  # Initially zero participants
         participants=[],  # Initially no participants
-        startDate=form.start_date,
-        endDate=form.end_date,
+        startDate=form.startDate,
+        endDate=form.endDate,
         currentDay=1,  # Starting at day 1
-        totalDays=(datetime.date.fromisoformat(form.end_date) - datetime.date.fromisoformat(form.start_date)).days + 1,
+        totalDays=(datetime.date.fromisoformat(form.endDate) - datetime.date.fromisoformat(form.startDate)).days + 1,
         status=GoalStatus.NOT_STARTED,
         creator=form.creator,
-        creatorName=form.creator_name,
+        creatorName=form.creatorName,
         submissions=[],  # Initially no submissions
+        isPublic=form.isPublic,
+        verificationMethod=form.verificationMethod,
     )
 
     result = db.create_goal(new_goal)
