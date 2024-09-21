@@ -9,6 +9,8 @@ const Home: React.FC = () => {
   const router = useRouter();
   const { authToken } = useDynamicContext();
 
+  console.log(authToken);
+
   return (
     <Layout>
       <Container size="lg">
