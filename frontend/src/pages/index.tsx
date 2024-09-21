@@ -2,14 +2,17 @@ import React from 'react';
 import { Container, Title, Text, Button, Group, Stack } from '@mantine/core';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout/layout';
+import {  useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import Landing from '../components/landing';
 
 const Home: React.FC = () => {
   const router = useRouter();
+  const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
 
   return (
     <Layout>
       <Container size="lg">
-        <Stack gap="xl" align="center" mt={50}>
+{        authToken ? (<Stack gap="xl" align="center" mt={50}>
           <Title order={1}>Welcome to Goal Tracker</Title>
           <Text size="xl">
             Set, monitor, and achieve your goals with our Web3-powered platform.
@@ -29,7 +32,13 @@ const Home: React.FC = () => {
             <Text>• Earn rewards for completing goals</Text>
             <Text>• Secure and transparent goal tracking with blockchain technology</Text>
           </Stack>
-        </Stack>
+        </Stack>)
+        : (
+          <Stack gap="xl" align="center" mt={50}>
+            <Landing />
+          </Stack>
+        )
+      }
       </Container>
     </Layout>
   );

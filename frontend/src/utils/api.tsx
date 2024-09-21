@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Goal } from '@/types/goal';
+import { getAuthToken } from '@dynamic-labs/sdk-react-core';
 
 const mockGoals: Record<string, Goal> = {
   '1': {
@@ -72,6 +73,10 @@ const mockUserGoals: Goal[] = [mockGoals['1'], mockGoals['2']];
 
 const USE_MOCK_DATA = true;
 const API_BASE_URL = 'http://localhost:8000';
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${getAuthToken()}`
+};
 
 export async function getGoalDetails(id: string): Promise<Goal> {
   if (USE_MOCK_DATA) {
@@ -123,7 +128,9 @@ export async function getUserGoals(account: string): Promise<Goal[]> {
     });
   } else {
     try {
-      const response = await axios.get(`${API_BASE_URL}/goals/user/${account ?? "1"}`);
+      const response = await axios.get(`${API_BASE_URL}/goals/user/${account ?? "1"}`, {
+        headers: headers
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching user goals:', error);
@@ -146,7 +153,9 @@ export async function updateGoal(id: string, updateData: Partial<Goal>) {
     });
   } else {
     try {
-      const response = await axios.post(`${API_BASE_URL}/goals/${id}`, updateData);
+      const response = await axios.post(`${API_BASE_URL}/goals/${id}`, updateData, {
+        headers: headers
+      });
       return response.data;
     } catch (error) {
       console.error('Error updating goal:', error);
@@ -168,7 +177,7 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
       const formData = new FormData();
       formData.append('photo', file);
       const response = await axios.post(`${API_BASE_URL}/goals/${goalId}/upload-photo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${getAuthToken()}` }
       });
       return response.data.photoUrl;
     } catch (error) {
