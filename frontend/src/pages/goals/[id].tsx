@@ -9,7 +9,7 @@ import SubmissionButton from '../../components/goals/submissionbutton';
 import SubmissionHistory from '../../components/goals/submissionhistory';
 import Layout from '../../components/layout/layout';
 import { Goal, Submission, SubmissionStatus } from '../../types/goal';
-import { getGoalDetails, updateGoal } from '../../utils/api';
+import { getGoalDetails, updateGoal, uploadPhoto } from '../../utils/api';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
 export default function GoalDetailPage() {
@@ -43,11 +43,12 @@ export default function GoalDetailPage() {
     return <Layout><Container><Loader size="xl" /></Container></Layout>;
   }
 
+  // const submissionsList = goalData.submissions.some(s => s.person === user?.firstName && s.status === 'pending submission')
   const isParticipant = goalData.participants.includes(user?.userId ?? "test");
   const canJoin = !isParticipant && goalData.status === 'Not Started';
-  const canSubmit = isParticipant && goalData.status === 'In Progress' &&
-    goalData.submissions.some(s => s.person === user?.firstName && s.status === 'pending submission');
+  const canSubmit = isParticipant && goalData.status === 'In Progress';
   const pendingVerifications = goalData.submissions.filter(s => s.status === 'pending verification');
+
 
   const handleUpdateGoal = async (updateData: Partial<Goal>) => {
     if (!user?.userId || !id) return;
@@ -77,14 +78,13 @@ export default function GoalDetailPage() {
   const handleSubmitPhoto = async (file: File) => {
     if (!file || !user?.userId) return;
     // Logic to upload file and get URL
-    const photoUrl = 'https://example.com/placeholder.jpg';  
-
+    const photoUrl = await uploadPhoto(goalData.id, file);
     const newSubmission: Submission = {
       id: Date.now().toString(),
       day: goalData.currentDay,
-      person: user?.firstName || user?.alias || '',
+      person: user?.firstName ?? '',
       status: 'pending verification',
-      photoUrl
+      photoUrl: photoUrl
     };
 
     handleUpdateGoal({
@@ -141,7 +141,7 @@ export default function GoalDetailPage() {
             </>
           )}
         </Stack>
-      </Container> d
+      </Container>
 
       <Modal opened={opened} onClose={close} title="Submission Photo">
         {selectedSubmission && selectedSubmission.photoUrl && (

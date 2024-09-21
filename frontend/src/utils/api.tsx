@@ -209,7 +209,7 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
       const formData = new FormData();
       formData.append('photo', file);
       const response = await axios.post(`${API_BASE_URL}/goals/${goalId}/upload-photo`, formData, {
-        headers: headers
+        headers: { 'Content-Type': 'multipart/form-data'}
       });
       return response.data.photoUrl;
     } catch (error) {
