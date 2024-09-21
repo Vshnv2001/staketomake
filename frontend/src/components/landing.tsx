@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Title, Text, Button, Group, Stack, Image } from '@mantine/core';
+import { Container, Title, Text, Stack, Image } from '@mantine/core';
 import sample_1 from '../assets/sample_1.png';
 
 export default function Landing() {

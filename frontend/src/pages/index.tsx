@@ -4,15 +4,17 @@ import { useRouter } from 'next/router';
 import Layout from '../components/layout/layout';
 import {  useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Landing from '../components/landing';
+import { useState, useEffect } from 'react';
 
 const Home: React.FC = () => {
   const router = useRouter();
   const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   return (
     <Layout>
       <Container size="lg">
-{        authToken ? (<Stack gap="xl" align="center" mt={50}>
+{        !!authToken ? (<Stack gap="xl" align="center" mt={50}>
           <Title order={1}>Welcome to Goal Tracker</Title>
           <Text size="xl">
             Set, monitor, and achieve your goals with our Web3-powered platform.
