@@ -7,10 +7,14 @@ import { useState } from 'react';
 const Social = () => {
 
   const [telegramId, setTelegramId] = useState('');
+  const [isSaved, setIsSaved] = useState(false);
+  const [isChanged, setIsChanged] = useState(false);
   const { authToken, primaryWallet } = useDynamicContext();
 
   const handleSave = () => {
     // TODO: fix this, not sure what we are using for user id.
+    setIsSaved(false);
+    setIsChanged(false);
     fetch(`http://localhost:8000/api/telegram/${primaryWallet?.address}?telegram_id=${telegramId}`, {
       method: 'POST',
       headers: {
@@ -25,6 +29,8 @@ const Social = () => {
     .then(response => response.json())
     .then(data => {
       console.log('Success:', data);
+      setIsSaved(true);
+      setIsChanged(false);
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -45,10 +51,10 @@ const Social = () => {
             <Text style={{ fontWeight: 700 }}>Telegram ID</Text>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Text style={{ fontWeight: 700, marginRight: 2 }}>@</Text>
-              <input type="text" placeholder="username" style={{ flex: 1 }} value={telegramId} onChange={(e) => setTelegramId(e.target.value)} />
+              <input type="text" placeholder="username" style={{ flex: 1 }} value={telegramId} onChange={(e) => {setTelegramId(e.target.value); setIsChanged(true)}} />
             </div>
           </Group>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} disabled={!isChanged}>{isSaved ? 'Saved' : isChanged ? 'Save' : 'Saved'}</Button>
           </Stack>
         </Container>
       </Layout>
