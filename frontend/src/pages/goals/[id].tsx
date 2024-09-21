@@ -7,14 +7,14 @@ import PendingVerifications from '../../components/goals/pendingverifications';
 import SubmissionButton from '../../components/goals/submissionbutton';
 import SubmissionHistory from '../../components/goals/submissionhistory';
 import Layout from '../../components/layout/layout';
-import { useWeb3 } from '../../contexts/web3context';
 import { Goal, Submission, SubmissionStatus } from '../../types/goal';
 import { getGoalDetails, updateGoal } from '../../utils/api';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
 export default function GoalDetailPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { account } = useWeb3();
+  const { authToken, user } = useDynamicContext();
   const [goalData, setGoalData] = useState<Goal | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
@@ -45,14 +45,14 @@ export default function GoalDetailPage() {
     return <Layout><Container><Loader size="xl" /></Container></Layout>;
   }
 
-  const isParticipant = account && goalData.participants.includes(account);
+  const isParticipant = !!authToken && goalData.participants.includes(authToken);
   const canJoin = !isParticipant && goalData.status === 'Not Started';
   const canSubmit = isParticipant && goalData.status === 'In Progress' &&
-    goalData.submissions.some(s => s.person === account && s.status === 'pending submission');
+    goalData.submissions.some(s => s.person === user?.firstName && s.status === 'pending submission');
   const pendingVerifications = goalData.submissions.filter(s => s.status === 'pending verification');
 
   const handleUpdateGoal = async (updateData: Partial<Goal>) => {
-    if (!account || !id) return;
+    if (!authToken || !id) return;
     setIsLoading(true);
     try {
       const updatedGoal = await updateGoal(id as string, updateData);
@@ -63,13 +63,13 @@ export default function GoalDetailPage() {
       setIsLoading(false);
     }
   };
-
   const handleJoinGoal = () => {
-    handleUpdateGoal({ participants: [...(goalData.participants || []), account!] });
+    if (!authToken) return;
+    handleUpdateGoal({ participants: [...(goalData.participants || []), authToken!] });
   };
 
   const handleSubmitPhoto = async (file: File) => {
-    if (!file) return;  // Check if file exists
+    if (!file || !authToken) return;  // Check if file and authToken exist
 
     // need some logic here to upload the file to some server for url
     const photoUrl = 'https://example.com/placeholder.jpg';  
@@ -77,7 +77,7 @@ export default function GoalDetailPage() {
     const newSubmission: Submission = {
       id: Date.now().toString(), // Generate a temporary ID
       day: goalData.currentDay,
-      person: account!,
+      person: user?.firstName || user?.alias || '',
       status: 'pending verification',
       photoUrl
     };

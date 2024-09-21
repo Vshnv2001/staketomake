@@ -5,7 +5,7 @@ import Layout from '../../components/layout/layout';
 import { Goal } from '@/types/goal';
 import { getAllGoals, getUserGoals } from '@/utils/api';
 import GoalCard from '@/components/goals/GoalCard';
-import { useWeb3 } from '../../contexts/web3context';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
 const Goals: React.FC = () => {
   const router = useRouter();
@@ -13,14 +13,14 @@ const Goals: React.FC = () => {
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);  
-  const { account } = useWeb3();
+    const { authToken } = useDynamicContext();
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
         const [userGoalsData, allGoalsData] = await Promise.all([
-          getUserGoals(account ?? ""),
+          getUserGoals(authToken ?? ""),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);
@@ -38,7 +38,7 @@ const Goals: React.FC = () => {
     };
 
     fetchGoals();
-  }, [account]);
+  }, [authToken]);
 
   if (isLoading) {
     return (

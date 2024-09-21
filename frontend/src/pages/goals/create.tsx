@@ -3,14 +3,14 @@ import { useRouter } from 'next/router';
 import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
-import { useWeb3 } from '../../contexts/web3context';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Layout from '../../components/layout/layout';
 import {GoalFormValues} from '../../types/goal';
 
 
 export default function CreateGoal() {
   const router = useRouter();
-  const { account, signer } = useWeb3();
+  const { authToken} = useDynamicContext();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<GoalFormValues>({
@@ -33,7 +33,7 @@ export default function CreateGoal() {
   });
 
   const handleSubmit = async (values: GoalFormValues) => {
-    if (!account || !signer) {
+    if (!authToken) {
       alert('Please connect your wallet first');
       return;
     }

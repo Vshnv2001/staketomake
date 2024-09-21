@@ -4,12 +4,10 @@ import { useRouter } from 'next/router';
 import Layout from '../components/layout/layout';
 import {  useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Landing from '../components/landing';
-import { useState, useEffect } from 'react';
-
+  
 const Home: React.FC = () => {
   const router = useRouter();
-  const { authToken, handleLogOut, user, setShowAuthFlow } = useDynamicContext();
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const { authToken } = useDynamicContext();
 
   return (
     <Layout>
