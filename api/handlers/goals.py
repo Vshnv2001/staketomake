@@ -66,10 +66,10 @@ def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
 
 
 async def upload_photo(goal_id: str, photo: UploadFile) -> str:
-    # Step 1: Validate the goal ID
-    goal = get_goal_by_id(goal_id)
+    # Validate the goal ID
+    _ = get_goal_by_id(goal_id)
 
-    # Step 2: Save the uploaded photo
+    # Save the uploaded photo
     file_extension = os.path.splitext(photo.filename)[1]
     if file_extension.lower() not in [".jpg", ".jpeg", ".png", ".gif"]:
         raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
@@ -86,17 +86,10 @@ async def upload_photo(goal_id: str, photo: UploadFile) -> str:
     finally:
         photo.file.close()
 
-    # Step 3: Generate a URL for the saved photo
+    # Generate a URL for the saved photo
     photo_url = f"/api/goals/photos/{photo_filename}"
 
-    # Step 4: Update the goal's submissions with the new photo URL
-    new_submission = {"id": str(uuid.uuid4()), "day": goal.current_day, "person": goal.creator_name, "status": "completed", "photoUrl": photo_url}
-    goal.submissions.append(new_submission)
-
-    # Update the goal in the database
-    goals_db.update_goal_partial(goal)
-
-    # Step 5: Return the photo URL
+    # Return the photo URL
     return photo_url
 
 
