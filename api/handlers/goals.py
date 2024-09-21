@@ -27,8 +27,8 @@ def create_goal(form: GoalFormValues) -> Goal:
         name=form.title,
         description=form.description,
         amountStaked=0,
-        participantsCnt=0,  # Initially zero participants
-        participants=[],  # Initially no participants
+        participantsCnt=1,  # Initially zero participants
+        participants=[form.creator],  # Initially no participants
         startDate=form.startDate,
         endDate=form.endDate,
         currentDay=1,  # Starting at day 1
