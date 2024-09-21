@@ -5,7 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import user
+from routers import goals
 
 
 @asynccontextmanager
@@ -34,7 +34,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Root Message"}
+    return {"message": "Welcome to the StakeToMake API!"}
 
 
 @app.get("/health_check")
@@ -44,7 +44,7 @@ def health_check():
 
 
 # Routers
-app.include_router(user.router)
+app.include_router(goals.router)
 
 if __name__ == "__main__":
     uvicorn.run(app)
