@@ -8,7 +8,7 @@ from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 import database.supabase_client as db
-from handlers import checks, contract
+from handlers import checks
 from models.goal import Goal
 from models.goal_form import GoalFormValues
 from models.submission import Submission
@@ -43,7 +43,6 @@ def create_goal(form: GoalFormValues) -> Goal:
         verificationMethod=form.verificationMethod,
     )
     new_goal = checks.test_and_set_logic(new_goal)
-    contract.create_goal(new_goal)
     return new_goal
 
 

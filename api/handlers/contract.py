@@ -22,18 +22,6 @@ def get_contract():
         return None
 
 
-def create_goal(goal: Goal):
-    try:
-        contract = get_contract()
-        start_date_unix = int(datetime.datetime.fromisoformat(goal.startDate).timestamp())
-        end_date_unix = int(datetime.datetime.fromisoformat(goal.endDate).timestamp())
-        contract.functions.stake(goal.id, goal.name, goal.description, start_date_unix, end_date_unix).transact()
-    except Exception as e:
-        print(e)
-        return False
-    return True
-
-
 def submit_goal_data(goal: Goal):
     try:
         contract = get_contract()
