@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for staketomake on 2024-09-20T05:42:54+08:00
+# fly.toml app configuration file generated for staketomake on 2024-09-21T16:28:02+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -17,6 +17,4 @@ primary_region = 'sin'
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+  size = 'shared-cpu-1x'

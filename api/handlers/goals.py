@@ -2,12 +2,12 @@ from typing import Dict, List
 import uuid
 import os
 from pathlib import Path
-import shutil
+import datetime
 
 from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
-import database.goals as goals_db
+import database.supabase_client as db
 from models.goal import Goal
 from models.goal_form import GoalFormValues
 from models.enums import GoalStatus
@@ -26,43 +26,43 @@ def create_goal(form: GoalFormValues) -> Goal:
         id=goal_id,
         name=form.title,
         description=form.description,
-        amount_staked=0,
+        amountStaked=0,
         participantsCnt=0,  # Initially zero participants
         participants=[],  # Initially no participants
-        start_date=form.start_date,
-        end_date=form.end_date,
-        current_day=1,  # Starting at day 1
-        total_days=(form.end_date - form.start_date).days + 1,
+        startDate=form.start_date,
+        endDate=form.end_date,
+        currentDay=1,  # Starting at day 1
+        totalDays=(datetime.date.fromisoformat(form.end_date) - datetime.date.fromisoformat(form.start_date)).days + 1,
         status=GoalStatus.NOT_STARTED,
         creator=form.creator,
-        creator_name=form.creator_name,
+        creatorName=form.creator_name,
         submissions=[],  # Initially no submissions
     )
 
-    result = goals_db.create_goal(new_goal)
+    result = db.create_goal(new_goal)
     return result
 
 
 def get_goal_by_id(goal_id: str) -> Goal:
-    goal = goals_db.get_goal_by_id(goal_id)
+    goal = db.get_goal_by_id(goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found.")
     return goal
 
 
 def get_all_goals() -> List[Goal]:
-    return goals_db.all_goals()
+    return db.all_goals()
 
 
 def get_user_goals(user_id: str) -> List[Goal]:
-    return goals_db.get_user_goals(user_id)
+    return db.get_goals_by_user(user_id)
 
 
 def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
     current_goal = get_goal_by_id(goal_id)
     for key, value in goal.items():
         setattr(current_goal, key, value)
-    return goals_db.update_goal_partial(current_goal)
+    return db.update_goal(current_goal)
 
 
 async def upload_photo(goal_id: str, photo: UploadFile) -> str:
@@ -76,25 +76,9 @@ async def upload_photo(goal_id: str, photo: UploadFile) -> str:
 
     # Generate a unique filename
     photo_filename = f"{uuid.uuid4()}{file_extension}"
-    photo_path = os.path.join(UPLOAD_DIRECTORY, photo_filename)
-
-    try:
-        with open(photo_path, "wb") as buffer:
-            shutil.copyfileobj(photo.file, buffer)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to save the uploaded photo.") from e
-    finally:
-        photo.file.close()
 
     # Generate a URL for the saved photo
-    photo_url = f"/api/goals/photos/{photo_filename}"
+    photo_url = db.upload_photo_blob(photo_filename, photo.file.read())
 
     # Return the photo URL
     return photo_url
-
-
-def get_photo(photo_filename: str):
-    photo_path = os.path.join(UPLOAD_DIRECTORY, photo_filename)
-    if not os.path.exists(photo_path):
-        raise HTTPException(status_code=404, detail="Photo not found.")
-    return FileResponse(photo_path)

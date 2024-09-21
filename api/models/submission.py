@@ -5,7 +5,7 @@ from models.enums import SubmissionStatus
 
 class Submission(BaseModel):
     id: str = Field(..., description="Unique identifier for the submission")
-    day: int = Field(..., ge=1, description="Day number of the submission")
+    day: int = Field(..., description="Day number of the submission")
     person: str = Field(..., description="Name of the person who made the submission")
     status: SubmissionStatus = Field(..., description="Current status of the submission")
     photo_url: Optional[str] = Field(
