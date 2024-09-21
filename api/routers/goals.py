@@ -44,7 +44,7 @@ def list_user_goals_endpoint(user_id: str):
 
 
 @router.post("/{goal_id}", response_model=Goal, summary="Update a goal by ID with partial data")
-def update_goal_by_id_endpoint(goal_id: str, goal: Dict):
+def update_goal_by_id_endpoint(goal_id: str, goal: Goal):
     """
     Update a specific goal by its ID with complete data.
     """

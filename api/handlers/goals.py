@@ -11,6 +11,7 @@ import database.supabase_client as db
 from handlers import checks, contract
 from models.goal import Goal
 from models.goal_form import GoalFormValues
+from models.submission import Submission
 from models.enums import GoalStatus
 
 # Directory where uploaded photos will be stored
@@ -64,11 +65,8 @@ def get_user_goals(user_id: str) -> List[Goal]:
     return user_goals_checked
 
 
-def update_goal_by_id_partial(goal_id: str, goal: Dict) -> Goal:
-    current_goal = get_goal_by_id(goal_id)
-    for key, value in goal.items():
-        setattr(current_goal, key, value)
-    current_goal = checks.test_and_set_logic(current_goal)
+def update_goal_by_id_partial(goal_id: str, goal: Goal) -> Goal:
+    current_goal = checks.test_and_set_logic(goal)
     return current_goal
 
 
