@@ -7,12 +7,49 @@ import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import Layout from '../../components/layout/layout';
 import { GoalFormValues } from '../../types/goal';
 import { createGoal } from '../../utils/api';
+import { addDays } from 'date-fns';
+
+const tomorrow = addDays(new Date(), 1);
+const thirtyDaysFromNow = addDays(tomorrow, 30);
+
+const goalTemplates = {
+  fitness: {
+    title: "30-Day Step Challenge",
+    description: "Achieve 12,000 steps every day for 30 consecutive days.",
+    stakingAmount: 0.1,
+    startDate: tomorrow,
+    endDate: thirtyDaysFromNow,
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+  nutrition: {
+    title: "Veggie Variety",
+    description: "Eat some form of vegetables every day for 21 days.",
+    stakingAmount: 0.05,
+    startDate: tomorrow,
+    endDate: addDays(tomorrow, 21),
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+  mindfulness: {
+    title: "Gratitude Gambit",
+    description: "Write 3 unique things you're grateful for every day for 30 days. No repeats allowed.",
+    stakingAmount: 0.1,
+    startDate: tomorrow,
+    endDate: thirtyDaysFromNow,
+    verificationMethod: 'photo',
+    isPublic: true,
+  },
+};
+
+type GoalTemplateCategories = keyof typeof goalTemplates;
 
 export default function CreateGoal() {
   const router = useRouter();
   const { user } = useDynamicContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplateCategories | null>(null);
 
   const form = useForm<GoalFormValues>({
     initialValues: {
@@ -55,11 +92,39 @@ export default function CreateGoal() {
     }
   };
 
+  const handleTemplateSelect = (category: GoalTemplateCategories) => {
+    setSelectedTemplate(category);
+    const template = goalTemplates[category];
+    form.setValues({
+      ...form.values,
+      title: template.title,
+      description: template.description,
+      stakingAmount: template.stakingAmount,
+      startDate: template.startDate,
+      endDate: template.endDate,
+      verificationMethod: template.verificationMethod,
+      isPublic: template.isPublic,
+    });
+  };
+
   return (
     <Layout>
       <Container size="sm">
         <Title order={1} mb="xl">Create New Goal</Title>
         {error && <Alert color="red" mb="md">{error}</Alert>}
+        
+        <Group mb="lg">
+          {Object.entries(goalTemplates).map(([category, template]) => (
+            <Button
+              key={category}
+              onClick={() => handleTemplateSelect(category as GoalTemplateCategories)}
+              variant={selectedTemplate === category ? "filled" : "light"}
+            >
+              {template.title}
+            </Button>
+          ))}
+        </Group>
+
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             <TextInput

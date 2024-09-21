@@ -7,7 +7,6 @@ import {
   Menu,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MantineLogo } from '@mantinex/mantine-logo';
 import { IconChevronDown } from '@tabler/icons-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -15,6 +14,8 @@ import { mainnet } from 'viem/chains';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import classes from '../../styles/HeaderMenu.module.css';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import logo from '../../assets/logo.png';
 
 const DynamicWidget = dynamic(
   () =>
@@ -115,9 +116,9 @@ export function HeaderMenu() {
 
   return (
     <header className={classes.header}>
-      <Container size="md">
+      <Container size="xl">
         <div className={classes.inner}>
-          <MantineLogo size={28} />
+          <Image src={logo.src} alt={'logo'} width={182} height={52} />
           <Group gap={5} visibleFrom="sm" className={classes.navGroup}>
             {items}
           </Group>
