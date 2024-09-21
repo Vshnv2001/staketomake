@@ -39,7 +39,7 @@ const Social = () => {
 
     return (
         <Layout>
-        <Container size="lg">
+        <Container size="sm">
           <Stack gap="xl" mt={50}>
             <Group justify='space-between'>
               <Stack>
