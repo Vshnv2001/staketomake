@@ -217,6 +217,7 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
       console.error('Error uploading photo:', error);
       throw error;
     }
+    
   }
 }
 
