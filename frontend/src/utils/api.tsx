@@ -129,6 +129,7 @@ export async function getUserGoals(account: string): Promise<Goal[]> {
     });
   } else {
     try {
+      console.log(`${API_BASE_URL}/goals/user/${account ?? "1"}`)
       const response = await axios.get(`${API_BASE_URL}/goals/user/${account ?? "1"}`, {
         headers: headers
       });
