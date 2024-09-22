@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Container, Title, TextInput, Textarea, NumberInput, Button, Group, Stack, Select, Switch, Alert } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
@@ -51,12 +51,17 @@ export default function CreateGoal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<GoalTemplateCategories | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<GoalFormValues>({
     initialValues: {
       title: '',
       description: '',
-      stakingAmount: 0,
+      stakingAmount: 0.1,
       startDate: new Date(),
       endDate: new Date(),
       verificationMethod: '',
@@ -74,8 +79,8 @@ export default function CreateGoal() {
   });
 
   const handleSubmit = async (values: GoalFormValues) => {
-    if (!user?.userId) {
-      setError('Please connect your wallet first');
+    if (!isClient) {
+      setError('This action can only be performed in a browser environment.');
       return;
     }
 
@@ -83,18 +88,35 @@ export default function CreateGoal() {
     setError(null);
 
     try {
+      console.log("Creating goal with values:", values);
       const createdGoal = await createGoal(values);
-      router.push(`/goals/${createdGoal.id}`);
-      //stake in a goal
-      stakeTokens(createdGoal.id, createdGoal.name, createdGoal.description, createdGoal.startDate, createdGoal.endDate, createdGoal.amountStaked);
+      console.log("Created goal:", createdGoal);
+
+      try {
+        console.log("Initiating staking process...");
+        const stakingResult = await stakeTokens({
+          goalId: createdGoal.id || `goal_${Date.now()}`, // Fallback ID if not provided
+          goalType: createdGoal.title || "Default Goal Type",
+          goalDescription: createdGoal.description || "No description provided",
+          goalStart: createdGoal.startDate || new Date(),
+          goalEnd: createdGoal.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+        });
+
+        console.log("Staking result:", stakingResult);
+        router.push(`/goals/${createdGoal.id}`);
+      } catch (stakingError) {
+        console.error('Staking error:', stakingError);
+        setError('Failed to stake tokens. The goal was created, but not staked.');
+      }
     } catch (error) {
       console.error('Error creating goal:', error);
       setError('Failed to create goal. Please try again.');
     } finally {
       setLoading(false);
     }
-
   };
+
+
 
   const handleTemplateSelect = (category: GoalTemplateCategories) => {
     setSelectedTemplate(category);
