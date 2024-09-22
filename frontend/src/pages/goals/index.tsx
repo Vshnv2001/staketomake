@@ -14,14 +14,14 @@ const Goals: React.FC = () => {
   const [recommendedGoals, setRecommendedGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useDynamicContext();
+  const { user, primaryWallet } = useDynamicContext();
 
   useEffect(() => {
     const fetchGoals = async () => {
       try {
         setIsLoading(true);
         const [userGoalsData, allGoalsData] = await Promise.all([
-          getUserGoals(user?.userId ?? ""),
+          getUserGoals(primaryWallet?.address ?? ""),
           getAllGoals()
         ]);
         setUserGoals(userGoalsData);

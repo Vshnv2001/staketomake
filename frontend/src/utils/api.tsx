@@ -57,7 +57,7 @@ const mockGoals: Record<string, Goal> = {
     totalDays: 30,
     status: 'In Progress',
     creator: '0x0987654321098765432109876543210987654321',
-    creatorName: 'Jane Doe', 
+    creatorName: 'Jane Doe',
     submissions: [
       { id: '1', day: 3, person: 'person 2', status: 'pending submission' },
       { id: '2', day: 3, person: 'person 1', status: 'pending verification', photoUrl: 'https://example.com/photo3.jpg' },
@@ -161,10 +161,10 @@ export async function createGoal(goalDetails: GoalFormValues) {
         endDate: goalDetails.endDate.toISOString().split('T')[0],     // Format to 'YYYY-MM-DD'
       };
       console.log(formattedValues);
-      const response = await axios.post(`${API_BASE_URL}/goals`, formattedValues  , {
+      const response = await axios.post(`${API_BASE_URL}/goals`, formattedValues, {
         headers: headers
       });
-      return response.data;   
+      return response.data;
     } catch (error) {
       console.error('Error creating goal:', error);
       throw error;
@@ -210,14 +210,14 @@ export async function uploadPhoto(goalId: string, file: File): Promise<string> {
       const formData = new FormData();
       formData.append('photo', file);
       const response = await axios.post(`${API_BASE_URL}/goals/${goalId}/upload-photo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data'}
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       return response.data.photoUrl;
     } catch (error) {
       console.error('Error uploading photo:', error);
       throw error;
     }
-    
+
   }
 }
 
