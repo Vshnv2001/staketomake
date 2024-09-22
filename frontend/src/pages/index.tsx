@@ -9,14 +9,11 @@ import {
   Group,
   ThemeIcon,
   Stack,
-  List,
   Box,
 } from '@mantine/core';
 import { IconTarget, IconCoinBitcoin, IconUsers, IconTrophy, IconProps, IconCashBanknote, IconDeviceMobile, IconBuildingBank } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout/layout';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import Landing from '../components/landing';
 
 interface StepCardProps {
   title: string;
@@ -91,7 +88,6 @@ const FeatureCard: React.FC<StepCardProps> = ({ title, description, icon: Icon }
 
 const Home: React.FC = () => {
   const router = useRouter();
-  const { authToken } = useDynamicContext();
 
   return (
     <Layout>

@@ -1,5 +1,6 @@
 /api/.env
 /api/venv
+/telegram/venv
 /api/__pycache__
 /api/uploaded_photos
 __pycache__
