@@ -1,11 +1,10 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import goals, verify, telegram
+from routers import goals, telegram
 
 
 @asynccontextmanager
@@ -45,7 +44,6 @@ def health_check():
 
 # Routers
 app.include_router(goals.router)
-app.include_router(verify.router)
 app.include_router(telegram.router)
 if __name__ == "__main__":
     uvicorn.run(app)
